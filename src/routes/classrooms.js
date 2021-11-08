@@ -1,6 +1,6 @@
 import express from 'express';
 
-import ClassroomModel from '../models/classroom';
+import ClassroomModel from '../models/classroom.js';
 
 const router = express.Router();
 

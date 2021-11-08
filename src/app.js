@@ -8,7 +8,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 
 // import routes
-import classroomsRoute  from './routes/classrooms'; 
+import classroomsRoute  from './routes/classrooms.js'; 
 
 // import dotenv
 import dotenv from 'dotenv';
@@ -48,8 +48,9 @@ mongoose.connect(
   ) 
 
 // starting the server
-app.listen(3001, () => {
-  console.log('listening on port 3001');
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.warn(`App listening on http://localhost:${PORT}`);
 });
 
 
