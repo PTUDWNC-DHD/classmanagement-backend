@@ -8,8 +8,7 @@ import morgan from 'morgan';
 import mongoose from 'mongoose';
 
 // import routes
-import homeRoute from './routes/home.js'
-import classroomsRoute  from './routes/classrooms.js';
+
 
 // import dotenv
 import dotenv from 'dotenv';
@@ -33,8 +32,7 @@ app.use(morgan('combined'));
 
 
 // use router 
-app.use('/', homeRoute);
-app.use('/classrooms', classroomsRoute);
+
 
 // connect to mongodb database
 mongoose.connect(
