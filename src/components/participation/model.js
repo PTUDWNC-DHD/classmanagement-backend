@@ -1,12 +1,11 @@
+const req = require("express/lib/request")
 const mongoose = require("mongoose")
+const User = require('../user/model')
 
 const ParticipationSchema = new mongoose.Schema({
     classId: {
         type: String,
         required: true,
-    },
-    code: {
-        type: String,
     },
     isStudent: {
         type: Boolean,
@@ -14,14 +13,16 @@ const ParticipationSchema = new mongoose.Schema({
     },
     userId: {
         type: String,
-    }
+        required: true,
+    },
 })
 
-ParticipationSchema.pre('save', (next) => {
-    if (this.code || this.userId) {
-        return next()
+ParticipationSchema.pre("save", async (next) => {
+    const user = await User.findById(this.userId)
+    if (!user) {
+        throw 'User not exist'
     }
-    throw 'Must contain student code or userId'
+    next()
 })
 
 const Participation = mongoose.model("participations", ParticipationSchema)
