@@ -2,6 +2,23 @@ const User = require("./model")
 const bcrypt = require("bcrypt")
 const { GetParticipationsByClass } = require("../participation/controller")
 
+const getUser = async (id) => {
+    const user = await User.findById(id)
+    return user
+}
+
+const GetUsersByClass = async (classId) => {
+    const participations = await GetParticipationsByClass(classId)
+    let users = participations.map(async (p) => {
+        const user = await User.findById(p.userId)
+        user.isStudent = p.isStudent
+        return user
+    })
+
+    users = Promise.all(users)
+    return users
+}
+
 const CreateUser = async ({ username, password, email, code }) => {
     let data = {}
     username && (data.username = username)
@@ -18,19 +35,25 @@ const CreateUser = async ({ username, password, email, code }) => {
     return user
 }
 
-const GetUsersByClass = async (classId) => {
-    const participations = await GetParticipationsByClass(classId)
-    let users = participations.map(async (p) => {
-        const user = await User.findById(p.userId)
-        user.isStudent = p.isStudent
-        return user
+const UpdateUser = async (id, data) => {
+    let updatedData = {}
+    Object.keys(data).forEach(p => {
+        User.schema.paths[p] && (updatedData[p] = data[p])
     })
 
-    users = Promise.all(users)
-    return users
+    const user = await User.findByIdAndUpdate(id, updatedData)
+    return user
+}
+
+const DeleteUser = async (id) => {
+    await User.findByIdAndDelete(id)
+    return true
 }
 
 module.exports = {
-    CreateUser,
+    GetUser,
     GetUsersByClass,
+    CreateUser,
+    UpdateUser,
+    DeleteUser,
 }

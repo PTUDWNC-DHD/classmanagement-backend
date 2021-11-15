@@ -1,16 +1,5 @@
 const Participation = require("./model")
 
-const CreateParticipation = async ({ classId, userId, isStudent }) => {
-    let data = {}
-    classId && (data.classId = classId)
-    userId &&
-        (data.userId = userId)(isStudent != undefined) &&
-        (data.isStudent = isStudent)
-
-    const participation = await Participation.create(data)
-    return participation
-}
-
 const GetParticipationsByClass = (classId) => {
     const participations = await Participation.find({
         classId,
@@ -27,8 +16,24 @@ const GetParticipationsByUser = (userId, isStudent = undefined) => {
     return participations
 }
 
+const CreateParticipation = async ({ classId, userId, isStudent }) => {
+    let data = {}
+    classId && (data.classId = classId)
+    userId &&
+        (data.userId = userId)(isStudent != undefined) &&
+        (data.isStudent = isStudent)
+
+    const participation = await Participation.create(data)
+    return participation
+}
+
+const DeleteParticipation = async ({ classId, userId }) => {
+    await Participation.findOneAndDelete({ classId, userId })
+    return false
+}
 module.exports = {
-    CreateParticipation,
     GetParticipationsByClass,
     GetParticipationsByUser,
+    CreateParticipation,
+    DeleteParticipation,
 }
