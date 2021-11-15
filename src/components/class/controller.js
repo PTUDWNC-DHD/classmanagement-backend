@@ -20,7 +20,7 @@ const GetClassesByUser = async (userId, isStudent = undefined) => {
 }
 
 const CreateClass = async ({ name, ownerId }) => {
-    const invite = crypto.randomBytes(20).toString()
+    const invite = crypto.randomUUID()
     const classroom = await Class.create({ name, ownerId, invite })
     return classroom
 }
