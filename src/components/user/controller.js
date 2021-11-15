@@ -42,7 +42,7 @@ const UpdateUser = async (id, data) => {
         User.schema.paths[p] && (updatedData[p] = data[p])
     })
 
-    const user = await User.findOneAndUpdate({ _id: id }, updatedData, { new: true })
+    const user = await User.findByIdAndUpdate( id, updatedData, { new: true })
     return user
 }
 
