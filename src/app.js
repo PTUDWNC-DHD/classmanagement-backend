@@ -1,18 +1,19 @@
 // import express
-import express, { urlencoded, json } from 'express';
+const express = require('express')
+const { urlencoded, json } = require('express')
 
 // import packages
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import mongoose from 'mongoose';
+const cors = require('cors')
+const helmet = require('helmet')
+const morgan = require('morgan')
+const mongoose = require('mongoose')
 
 // import routes
-
+const useRoute = require('./routes')
 
 // import dotenv
-import dotenv from 'dotenv';
-dotenv.config();
+const dotenv = require('dotenv')
+dotenv.config()
 
 // start app express
 const app = express();
@@ -21,18 +22,18 @@ const app = express();
 app.use(helmet());
 
 // parse the incoming requests with JSON payloads
-app.use(urlencoded({extended: true}));
+app.use(urlencoded({extended: true}))
 app.use(json()) 
 
 // enabling CORS for all requests
-app.use(cors());
+app.use(cors())
 
 // adding morgan to log HTTP requests
-app.use(morgan('combined'));
+app.use(morgan('combined'))
 
 
 // use router 
-
+useRoute(app)
 
 // connect to mongodb database
 mongoose.connect(
@@ -50,7 +51,7 @@ mongoose.connect(
 // starting the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.warn(`App listening on http://localhost:${PORT}`);
+  console.warn(`App listening on http://localhost:${PORT}`)
 });
 
 
