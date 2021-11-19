@@ -58,7 +58,7 @@ ParticipationSchema.pre("save", async function (next) {
             classId: this.classId,
         })
         if (participation) {
-            throw "User have already been in class"
+            throw "Student code have already been used by other user"
         }
     }
     if (this.isStudent && !this.code) {
@@ -68,6 +68,18 @@ ParticipationSchema.pre("save", async function (next) {
         throw "Paticipation must have userId or student code"
     }
     next()
+})
+
+ParticipationSchema.pre('findByIdAndUpdate', async function (next) {
+    if (this.code && this.classId) {
+        const participation = await Participation.findOne({
+            code: this.code,
+            classId: this.classId,
+        })
+        if (participation.userId) {
+            throw "Student code have already been used by other user"
+        }
+    }
 })
 
 const Participation = mongoose.model("participations", ParticipationSchema)

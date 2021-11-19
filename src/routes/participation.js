@@ -19,8 +19,8 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
     try {
-        const { userId, classId, isStudent } = req.body
-        const participation = await CreateParticipation({ userId, classId, isStudent })
+        const { userId, classId, isStudent, name, code } = req.body
+        const participation = await CreateParticipation({ userId, classId, isStudent, name, code })
         return res.json(participation)
     } catch (error) {
         res.json({
