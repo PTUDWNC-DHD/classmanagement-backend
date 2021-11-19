@@ -4,14 +4,14 @@
 # API
 ## Class api
 
-***get***|  **/class/**  
+***get***|  ```/class/``` 
 Get all class info  
 *input* =>  
 **None**  
 *output* =>  
 List of Classes's Info  
   
-***post***|  **/class/**  
+***post***|  ```/class/```  
 Create class  
 *input* =>   
 **name**: Name of class *required*  
@@ -19,14 +19,15 @@ Create class
 *output* =>   
 Class Info  
   
-***get***|  **/class/{classId}/**  
+***get***|  ```/class/{classId}/```  
 Get class info  
 *input* =>   
 **None**  
 *output* =>   
 Class Info  
-  
-***patch***|  **/class/{classId}/**  
+
+***patch***|  ```/class/{classId}/```
+
 Update data of class  
 *input* =>   
 **name**: New name of class  
@@ -34,7 +35,7 @@ Update data of class
 *output* =>   
 Class Info  
   
-***get***|  **/class/{classId}/users**  
+***get***|  ```/class/{classId}/users```  
 Get users of class  
 *input* =>   
 **None**  
@@ -43,14 +44,14 @@ List of users who join class
   
 ## User api
   
-***get***|  **/user/**  
+***get***|  ```/user/```  
 Get all user info  
 *input* =>   
 **None**  
 *output* =>   
 List all Users's Info  
   
-***post***|  **/user/**  
+***post***|  ```/user/```  
 Create user  
 *input* =>   
 **email**: email to login *required*  
@@ -60,14 +61,14 @@ Create user
 *output* =>   
 User Info  
   
-***get***|  **/user/{userId}**  
+***get***|  ```/user/{userId}```  
 Get user info  
 *input* =>   
 **None**  
 *output* =>   
 User Info  
   
-***patch***|  **/user/{userId}**  
+***patch***|  ```/user/{userId}```  
 Update user info  
 *input* =>   
 **email**: New email  
@@ -77,14 +78,14 @@ Update user info
 *output* =>   
 User Info  
   
-***delete***|  **/user/{userId}**  
+***delete***|  ```/user/{userId}```  
 Delete user  
 *input* =>   
 **None**  
 *output* =>   
 **true**  
   
-***get***|  **/user/{userId}/classes**  
+***get***|  ```/user/{userId}/classes```  
 Get all classes that user join  
 *input* =>   
 **None**  
@@ -93,14 +94,14 @@ List of classes
   
 ## Participation api  
   
-***get***|  **/join/**  
+***get***|  ```/join/```  
 Get all participations info  
 *input* =>   
 **None**  
 *output* =>   
 List all participations's Info  
   
-***post***|  **/join/**  
+***post***|  ```/join/```  
 Create participation  
 *input* =>   
 **userId**: id of user  
@@ -111,14 +112,14 @@ Create participation
 *output* =>   
 Participations Info  
   
-***get***|  **/join/{participationId}**  
+***get***|  ```/join/{participationId}```  
 Get participation info  
 *input* =>   
 **None**  
 *output* =>   
 participation Info  
   
-***delete***|  **/join/**  
+***delete***|  ```/join/```  
 Get participation info  
 *input* =>   
 **userId**: id of user (*required* if not have **code**)  
