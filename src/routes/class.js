@@ -1,5 +1,5 @@
 const express = require("express")
-const { CreateClass, GetClass } = require("../components/class/controller")
+const { CreateClass, GetClass, UpdateClass } = require("../components/class/controller")
 const Class = require("../components/class/model")
 
 const router = new express.Router()
@@ -31,6 +31,19 @@ router.get("/:id", async (req, res) => {
     try {
         const { id } = req.params
         const classroom = await GetClass(id)
+        res.json(classroom)
+    } catch (error) {
+        res.json({
+            errors: [error.toString()],
+        })
+    }
+})
+
+router.patch("/:id", async (req, res) => {
+    try {
+        const { id } = req.params
+        const { name, isEnded } = req.body
+        const classroom = await UpdateClass(id, { name, isEnded })
         res.json(classroom)
     } catch (error) {
         res.json({
