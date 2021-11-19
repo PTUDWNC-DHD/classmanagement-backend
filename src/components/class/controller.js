@@ -1,5 +1,8 @@
 const crypto = require("crypto")
-const { GetParticipationsByUser } = require("../participation/controller")
+const {
+    GetParticipationsByUser,
+    CreateParticipation,
+} = require("../participation/controller")
 const Class = require("./model")
 
 const GetClass = async (id) => {
@@ -22,6 +25,12 @@ const GetClassesByUser = async (userId, isStudent = undefined) => {
 const CreateClass = async ({ name, ownerId }) => {
     const invite = crypto.randomUUID()
     const classroom = await Class.create({ name, ownerId, invite })
+    await CreateParticipation({
+        classId: classroom._id,
+        userId: ownerId,
+        name: ownerId.name,
+        isStudent: false,
+    })
     return classroom
 }
 

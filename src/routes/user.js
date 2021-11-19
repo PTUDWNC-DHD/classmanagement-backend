@@ -1,4 +1,5 @@
 const express = require("express")
+const { GetClassesByUser } = require("../components/class/controller")
 const { CreateUser, GetUser, UpdateUser, DeleteUser } = require("../components/user/controller")
 const User = require("../components/user/model")
 
@@ -19,7 +20,7 @@ router.post("/", async (req, res) => {
     const { username, password, email, code, name } = req.body
     try {
         const user = await CreateUser({ username, password, email, code, name })
-        res.json(user)
+        return res.json(user)
     } catch (error) {
         res.json({
             errors: [error.toString()],
@@ -31,7 +32,10 @@ router.get("/:id", async (req, res) => {
     const { id } = req.params
     try {
         const user = await GetUser(id)
-        res.json(user)
+        if (!user) {
+            throw 'User not exist'
+        }
+        return res.json(user)
     } catch (error) {
         res.json({
             errors: [error.toString()],
@@ -44,7 +48,7 @@ router.patch("/:id", async (req, res) => {
     const data = req.body
     try {
         const user = await UpdateUser(id, data)
-        res.json(user)
+        return res.json(user)
     } catch (error) {
         res.json({
             errors: [error.toString()],
@@ -56,7 +60,19 @@ router.delete("/:id", async (req, res) => {
     const { id } = req.params
     try {
         const result = await DeleteUser(id)
-        res.json(result)
+        return res.json(result)
+    } catch (error) {
+        res.json({
+            errors: [error.toString()],
+        })
+    }
+})
+
+router.get('/:id/classes', async (req, res) => {
+    const { id } = req.params
+    try {
+        const classes = await GetClassesByUser(id)
+        return res.json(classes)
     } catch (error) {
         res.json({
             errors: [error.toString()],
