@@ -2,9 +2,14 @@ const User = require("./model")
 const bcrypt = require("bcrypt")
 const { GetParticipationsByClass } = require("../participation/controller")
 
+const FilterUser = (user) => {
+    delete user.password
+    return user
+}
+
 const GetUser = async (id) => {
     const user = await User.findById(id)
-    return user
+    return FilterUser(user)
 }
 
 const GetUsersByClass = async (classId) => {
@@ -12,18 +17,17 @@ const GetUsersByClass = async (classId) => {
     let users = participations.map(async (p) => {
         const user = await User.findById(p.userId)
         user.isStudent = p.isStudent
-        return user
+        return FilterUser(user)
     })
 
     users = Promise.all(users)
     return users
 }
 
-const CreateUser = async ({ username, password, email, code, name }) => {
+const CreateUser = async ({ username, password, email, name }) => {
     let data = {}
     username && (data.username = username)
     email && (data.email = email)
-    code && (data.code = code)
     name && (data.name = name)
 
     if (password) {

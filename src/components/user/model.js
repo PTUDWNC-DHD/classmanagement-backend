@@ -3,11 +3,11 @@ const mongoose = require("mongoose")
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
-        unique: true,
-        sparse: true,
+        required: true,
     },
     password: {
         type: String,
+        required: true,
     },
     email: {
         type: String,
@@ -19,29 +19,12 @@ const UserSchema = new mongoose.Schema({
             },
             message: "Invalid email",
         },
-        unique: true,
-        sparse: true,
-    },
-    code: {
-        type: String,
-        unique: true,
-        sparse: true,
+        required: true,
     },
     name: {
         type: String,
         required: true,
     }
-})
-
-UserSchema.pre('save', async function(next) {
-    if (!this.code && !this.email) {
-        throw 'User must have code or email'
-    }
-    if (this.email && !(this.username && this.password)) {
-        throw 'User must have both username and password'
-    }
-
-    next()
 })
 
 const User = mongoose.model("users", UserSchema)
