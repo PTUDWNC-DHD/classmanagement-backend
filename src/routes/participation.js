@@ -44,11 +44,20 @@ router.post(
                 })
                 return res.json(participation)
             }
+            if (!isOwner) {
+                participation = await CreateParticipation({
+                    userId: user._id,
+                    classId,
+                    isStudent,
+                    name: user.name,
+                    code,
+                })
+                return res.json(participation)
+            }
             participation = await CreateParticipation({
-                userId: user._id,
                 classId,
                 isStudent,
-                name: user.name,
+                name,
                 code,
             })
             return res.json(participation)
