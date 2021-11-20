@@ -1,7 +1,8 @@
 const express = require("express")
-const { CreateClass, GetClass, UpdateClass } = require("../components/class/controller")
+const { CreateClass, GetClass, UpdateClass, IsOwner } = require("../components/class/controller")
 const Class = require("../components/class/model")
 const { GetUsersByClass } = require("../components/user/controller")
+const passport = require("../middleware/passport")
 
 const router = new express.Router()
 
@@ -16,10 +17,23 @@ router.get("/", async (req, res) => {
     }
 })
 
-router.post("/", async (req, res) => {
-    const { name, ownerId } = req.body
+router.post("/", passport.authenticate("jwt", { session: false }), async (req, res) => {
+    const { user } = req
+    const { name } = req.body
     try {
-        const classroom = await CreateClass({ name, ownerId })
+        const classroom = await CreateClass({ name, ownerId: user._id })
+        return res.json(classroom)
+    } catch (error) {
+        res.json({
+            errors: [error.toString()],
+        })
+    }
+})
+
+router.get("/:id", passport.authenticate("jwt", { session: false }), async (req, res) => {
+    try {
+        const { id } = req.params
+        const classroom = await GetClass(id)
         if (!classroom) {
             throw 'Class not exist'
         }
@@ -31,21 +45,16 @@ router.post("/", async (req, res) => {
     }
 })
 
-router.get("/:id", async (req, res) => {
+router.patch("/:id", passport.authenticate("jwt", { session: false }), async (req, res) => {
+    const { user } = req
     try {
         const { id } = req.params
-        const classroom = await GetClass(id)
-        return res.json(classroom)
-    } catch (error) {
-        res.json({
-            errors: [error.toString()],
-        })
-    }
-})
+        const isOwner = await IsOwner(user._id, id)
 
-router.patch("/:id", async (req, res) => {
-    try {
-        const { id } = req.params
+        if (!isOwner) {
+            throw "Not have right to modify this class"
+        }
+
         const { name, isEnded } = req.body
         const classroom = await UpdateClass(id, { name, isEnded })
         return res.json(classroom)
@@ -56,7 +65,7 @@ router.patch("/:id", async (req, res) => {
     }
 })
 
-router.get('/:id/users', async (req, res) => {
+router.get('/:id/users', passport.authenticate("jwt", { session: false }), async (req, res) => {
     try {
         const { id } = req.params
         const users = await GetUsersByClass(id)
