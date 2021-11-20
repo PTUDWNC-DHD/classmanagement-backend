@@ -73,10 +73,23 @@ const DeleteUser = async (id) => {
     return true
 }
 
+const Login = async (username, password) => {
+    const user = await User.findOne({ username })
+    if (!user) {
+        throw 'Username not exist'
+    }
+    const comparePass = bcrypt.compareSync(password, user.password)
+    if (!comparePass) {
+        throw 'Wrong password'
+    }
+    return user
+}
+
 module.exports = {
     GetUser,
     GetUsersByClass,
     CreateUser,
     UpdateUser,
     DeleteUser,
+    Login,
 }
