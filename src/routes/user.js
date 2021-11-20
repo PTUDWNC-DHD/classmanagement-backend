@@ -92,4 +92,20 @@ router.get(
     }
 )
 
+router.get(
+    "/:id",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { id } = req.params
+        try {
+            const user = await GetUser(id)
+            return res.json(user)
+        } catch (error) {
+            res.json({
+                errors: [error.toString()],
+            })
+        }
+    }
+)
+
 module.exports = router
