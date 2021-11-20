@@ -24,6 +24,11 @@ const ClassSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
+    isEnded: {
+        type: Boolean,
+        required: true,
+        default: false,
+    }
 })
 
 const Class = mongoose.model("classes", ClassSchema)
