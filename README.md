@@ -13,7 +13,7 @@ List of Classes's Info
   
 ***post***|  ```/class/```  
 Create class  
-*input* =>   
+*input* => (Authentication required with Bearer token)   
 **name**: Name of class *required*  
 **ownerId**: Class's creator *required*  
 *output* =>   
@@ -21,7 +21,7 @@ Class Info
   
 ***get***|  ```/class/{classId}/```  
 Get class info  
-*input* =>   
+*input* => (Authentication required with Bearer token)   
 **None**  
 *output* =>   
 Class Info  
@@ -29,7 +29,7 @@ Class Info
 ***patch***|  ```/class/{classId}/```
 
 Update data of class  
-*input* =>   
+*input* => (Authentication required with Bearer token)   
 **name**: New name of class  
 **isEnded**: New status of class  
 *output* =>   
@@ -37,7 +37,7 @@ Class Info
   
 ***get***|  ```/class/{classId}/users```  
 Get users of class  
-*input* =>   
+*input* => (Authentication required with Bearer token)   
 **None**  
 *output* =>   
 List of users who join class  
@@ -63,14 +63,21 @@ User Info
   
 ***get***|  ```/user/{userId}```  
 Get user info  
-*input* =>   
+*input* => (Authentication required with Bearer token)   
+**None**  
+*output* =>   
+User Info  
+    
+***get***|  ```/user/me```  
+Get my info  
+*input* => (Authentication required with Bearer token)   
 **None**  
 *output* =>   
 User Info  
   
-***patch***|  ```/user/{userId}```  
-Update user info  
-*input* =>   
+***patch***|  ```/user/me```  
+Update my info  
+*input* => (Authentication required with Bearer token)   
 **email**: New email  
 **username**: New username  
 **password**: New password  
@@ -78,15 +85,15 @@ Update user info
 *output* =>   
 User Info  
   
-***delete***|  ```/user/{userId}```  
-Delete user  
-*input* =>   
+***delete***|  ```/user/me```  
+Delete me  
+*input* => (Authentication required with Bearer token)   
 **None**  
 *output* =>   
 **true**  
   
-***get***|  ```/user/{userId}/classes```  
-Get all classes that user join  
+***get***|  ```/user/me/classes```  
+Get all my classes  
 *input* =>   
 **None**  
 *output* =>   
@@ -102,28 +109,30 @@ Get all participations info
 List all participations's Info  
   
 ***post***|  ```/join/```  
-Create participation  
-*input* =>   
-**userId**: id of user  
+Add user into class  
+*input* => (Authentication required with Bearer token)   
 **classId**: id of class *required*  
-**code**: Student code ( *required* if **isStudent = true**)  
+**code**: Student code (*required* if **isStudent = true**)  
 **isStudent**: *true* if student and *false* if teacher  *required*  
+***DO NOT ADD BELOW IF REMOVE YOURSELF***  
+**userId**: id of user  
 **name**: Name to show in classes *required*  
 *output* =>   
 Participations Info  
   
 ***get***|  ```/join/{participationId}```  
 Get participation info  
-*input* =>   
+*input* => (Authentication required with Bearer token)   
 **None**  
 *output* =>   
 participation Info  
   
 ***delete***|  ```/join/```  
-Get participation info  
-*input* =>   
+Remove a user from class  
+*input* => (Authentication required with Bearer token)   
+**classId**: id of class *required*  
+***DO NOT ADD BELOW IF REMOVE YOURSELF***  
 **userId**: id of user (*required* if not have **code**)  
 **code**: Student code (*required* if not have **userId**)  
-**classId**: id of class *required*  
 *output* =>   
 **true**  
