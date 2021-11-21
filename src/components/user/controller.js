@@ -62,9 +62,9 @@ const UpdateUser = async (id, data) => {
 
 const DeleteUser = async (id) => {
     const user = await User.findById(id)
-    console.log(user);
+    console.log(user)
     const participations = await GetParticipationsByUser(user._id)
-    console.log(participations);
+    console.log(participations)
     const deleteProcess = participations.map(async (p) => {
         await UpdateParticipation(p._id, { userId: null })
     })
@@ -73,16 +73,30 @@ const DeleteUser = async (id) => {
     return true
 }
 
-const Login = async (username, password) => {
-    const user = await User.findOne({ username })
-    if (!user) {
-        throw 'Username not exist'
+const Login = async ({ username, password, email, token }) => {
+    if (username) {
+        const user = await User.findOne({ username })
+        if (!user) {
+            throw "User not exist"
+        }
+        const comparePass = bcrypt.compareSync(password, user.password)
+        if (!comparePass) {
+            throw "Wrong password"
+        }
+        return user
     }
-    const comparePass = bcrypt.compareSync(password, user.password)
-    if (!comparePass) {
-        throw 'Wrong password'
+    if (email) {
+        const verify = bcrypt.compareSync(process.env.LOGIN_BY_MAIL_SECRET, token)
+        if (!verify) {
+            throw 'Verify error'
+        }
+        const user = await User.findOne({ email })
+        if (!user) {
+            throw "User not exist"
+        }
+        return user
     }
-    return user
+    throw 'Required username or email'
 }
 
 module.exports = {
