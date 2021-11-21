@@ -135,3 +135,15 @@ Remove a user from class
 **code**: Student code (*required* if not have **userId**)  
 *output* =>   
 **true**  
+
+  
+## Invite api  
+  
+***get***|  ```/invite/```  
+Invite to class by email  
+*input* => (Authentication required with Bearer token)   
+**to**: List of email  
+**invitecode**: invite code of class  
+*output* =>   
+**true** if success  
+  
