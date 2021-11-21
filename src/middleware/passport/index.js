@@ -9,12 +9,10 @@ passport.use(
     new LocalStrategy({ session: false }, async function (
         username,
         password,
-        email,
-        token,
         done
     ) {
         try {
-            const user = await Login({ username, password, email, token })
+            const user = await Login(username, password)
             return done(null, user)
         } catch (error) {
             return done(null, false, { message: error })

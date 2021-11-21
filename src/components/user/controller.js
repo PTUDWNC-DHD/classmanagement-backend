@@ -73,8 +73,8 @@ const DeleteUser = async (id) => {
     return true
 }
 
-const Login = async ({ username, password, email, token }) => {
-    if (username) {
+const Login = async (username, password) => {
+    if (!username.includes('@')) {
         const user = await User.findOne({ username })
         if (!user) {
             throw "User not exist"
@@ -85,18 +85,17 @@ const Login = async ({ username, password, email, token }) => {
         }
         return user
     }
-    if (email) {
-        const verify = bcrypt.compareSync(process.env.LOGIN_BY_MAIL_SECRET, token)
+    if (username.includes('@')) {
+        const verify = bcrypt.compareSync(process.env.LOGIN_BY_MAIL_SECRET, password)
         if (!verify) {
             throw 'Verify error'
         }
-        const user = await User.findOne({ email })
+        const user = await User.findOne({ email: username })
         if (!user) {
             throw "User not exist"
         }
         return user
     }
-    throw 'Required username or email'
 }
 
 module.exports = {

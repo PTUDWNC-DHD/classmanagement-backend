@@ -3,6 +3,13 @@ const mongoose = require("mongoose")
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
+        validate: {
+            validator: function (value) {
+                const re = /^[a-zA-Z0-9]*$/
+                return re.test(value)
+            },
+            message: "Username only contains char and num",
+        },
         required: true,
     },
     password: {
@@ -24,7 +31,7 @@ const UserSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-    }
+    },
 })
 
 const User = mongoose.model("users", UserSchema)
