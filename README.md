@@ -108,10 +108,9 @@ Get all participations info
 *output* =>   
 List all participations's Info  
   
-***post***|  ```/join/```  
+***post***|  ```/join/{invitecode}```  
 Add user into class  
 *input* => (Authentication required with Bearer token)   
-**classId**: id of class *required*  
 **code**: Student code (*required* if **isStudent = true**)  
 **isStudent**: *true* if student and *false* if teacher  *required*  
 ***DO NOT ADD BELOW IF REMOVE YOURSELF***  

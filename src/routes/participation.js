@@ -1,5 +1,5 @@
 const express = require("express")
-const { IsOwner } = require("../components/class/controller")
+const { IsOwner, GetClassByInviteCode } = require("../components/class/controller")
 const {
     CreateParticipation,
     DeleteParticipation,
@@ -21,13 +21,15 @@ router.get("/", async (req, res) => {
 })
 
 router.post(
-    "/",
+    "/:invitecode",
     passport.authenticate("jwt", { session: false }),
     async (req, res) => {
         const { user } = req
+        const { invitecode } = req.params
         try {
-            const { userId, name, classId, isStudent, code } = req.body
-            const isOwner = await IsOwner(user._id, classId)
+            const classroom = await GetClassByInviteCode(invitecode)
+            const { userId, name, isStudent, code } = req.body
+            const isOwner = await IsOwner(user._id, classroom._id)
             
             if (userId && userId != user._id && !isOwner) {
                 throw "Not have right to add other user to this class"
@@ -37,7 +39,7 @@ router.post(
             if (userId) {
                 participation = await CreateParticipation({
                     userId,
-                    classId,
+                    classId: classroom._id,
                     isStudent,
                     name,
                     code,
@@ -47,7 +49,7 @@ router.post(
             if (!isOwner) {
                 participation = await CreateParticipation({
                     userId: user._id,
-                    classId,
+                    classId: classroom._id,
                     isStudent,
                     name: user.name,
                     code,
@@ -55,7 +57,7 @@ router.post(
                 return res.json(participation)
             }
             participation = await CreateParticipation({
-                classId,
+                classId: classroom._id,
                 isStudent,
                 name,
                 code,
