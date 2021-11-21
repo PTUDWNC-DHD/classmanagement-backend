@@ -11,6 +11,11 @@ const GetClass = async (id) => {
     return classroom
 }
 
+const GetClassByInviteCode = async (code) => {
+    const classroom = await Class.findOne({ invite: code })
+    return classroom
+}
+
 const GetClassesByUser = async (userId, isStudent = undefined) => {
     const participations = await GetParticipationsByUser(userId, isStudent)
 
@@ -64,6 +69,7 @@ const IsOwner = async (userId, classId) => {
 
 module.exports = {
     GetClass,
+    GetClassByInviteCode,
     GetClassesByUser,
     CreateClass,
     UpdateClass,
