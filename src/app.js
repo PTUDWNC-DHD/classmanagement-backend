@@ -1,3 +1,7 @@
+// import dotenv
+const dotenv = require('dotenv')
+dotenv.config()
+
 // import express
 const express = require('express')
 const { urlencoded, json } = require('express')
@@ -10,10 +14,6 @@ const mongoose = require('mongoose')
 
 // import routes
 const useRoute = require('./routes')
-
-// import dotenv
-const dotenv = require('dotenv')
-dotenv.config()
 
 // start app express
 const app = express();
@@ -31,7 +31,9 @@ app.use(cors())
 // adding morgan to log HTTP requests
 app.use(morgan('combined'))
 
-
+// adding passport to register authenticate strategies
+const passport = require('./middleware/passport')
+app.use(passport.initialize());
 // use router 
 useRoute(app)
 

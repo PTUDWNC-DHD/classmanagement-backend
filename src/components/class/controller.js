@@ -57,9 +57,15 @@ const UpdateClass = async (id, data) => {
     return classroom
 }
 
+const IsOwner = async (userId, classId) => {
+    const classroom = await GetClass(classId)
+    return userId == classroom.ownerId
+}
+
 module.exports = {
     GetClass,
     GetClassesByUser,
     CreateClass,
     UpdateClass,
+    IsOwner,
 }

@@ -1,7 +1,13 @@
 const express = require("express")
 const { GetClassesByUser } = require("../components/class/controller")
-const { CreateUser, GetUser, UpdateUser, DeleteUser } = require("../components/user/controller")
+const {
+    CreateUser,
+    GetUser,
+    UpdateUser,
+    DeleteUser,
+} = require("../components/user/controller")
 const User = require("../components/user/model")
+const passport = require("../middleware/passport")
 
 const router = new express.Router()
 
@@ -28,55 +34,78 @@ router.post("/", async (req, res) => {
     }
 })
 
-router.get("/:id", async (req, res) => {
-    const { id } = req.params
-    try {
-        const user = await GetUser(id)
-        if (!user) {
-            throw 'User not exist'
+router.get(
+    "/me",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { user } = req
+        return res.json(user)
+    }
+)
+
+router.patch(
+    "/me",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { user } = req
+        const data = req.body
+        try {
+            const newuser = await UpdateUser(user._id, data)
+            return res.json(newuser)
+        } catch (error) {
+            res.json({
+                errors: [error.toString()],
+            })
         }
-        return res.json(user)
-    } catch (error) {
-        res.json({
-            errors: [error.toString()],
-        })
     }
-})
+)
 
-router.patch("/:id", async (req, res) => {
-    const { id } = req.params
-    const data = req.body
-    try {
-        const user = await UpdateUser(id, data)
-        return res.json(user)
-    } catch (error) {
-        res.json({
-            errors: [error.toString()],
-        })
+router.delete(
+    "/me",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { user } = req
+        try {
+            const result = await DeleteUser(user._id)
+            return res.json(result)
+        } catch (error) {
+            res.json({
+                errors: [error.toString()],
+            })
+        }
     }
-})
+)
 
-router.delete("/:id", async (req, res) => {
-    const { id } = req.params
-    try {
-        const result = await DeleteUser(id)
-        return res.json(result)
-    } catch (error) {
-        res.json({
-            errors: [error.toString()],
-        })
+router.get(
+    "/me/classes",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { user } = req
+        try {
+            const classes = await GetClassesByUser(user._id)
+            return res.json(classes)
+        } catch (error) {
+            res.json({
+                errors: [error.toString()],
+            })
+        }
     }
-})
+)
 
-router.get('/:id/classes', async (req, res) => {
-    const { id } = req.params
-    try {
-        const classes = await GetClassesByUser(id)
-        return res.json(classes)
-    } catch (error) {
-        res.json({
-            errors: [error.toString()],
-        })
+router.get(
+    "/:id",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { id } = req.params
+        try {
+            const user = await GetUser(id)
+            return res.json(user)
+        } catch (error) {
+            res.json({
+                errors: [error.toString()],
+            })
+        }
     }
-})
+)
+
 module.exports = router
