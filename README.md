@@ -15,7 +15,6 @@ List of Classes's Info
 Create class  
 *input* => (Authentication required with Bearer token)   
 **name**: Name of class *required*  
-**ownerId**: Class's creator *required*  
 *output* =>   
 Class Info  
   
