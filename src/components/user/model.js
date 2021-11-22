@@ -3,6 +3,7 @@ const mongoose = require("mongoose")
 const UserSchema = new mongoose.Schema({
     username: {
         type: String,
+        unique: true,
         validate: {
             validator: function (value) {
                 const re = /^[a-zA-Z0-9]*$/
@@ -18,6 +19,7 @@ const UserSchema = new mongoose.Schema({
     },
     email: {
         type: String,
+        unique: true,
         validate: {
             validator: function (value) {
                 const re =

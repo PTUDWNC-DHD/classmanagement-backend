@@ -28,8 +28,23 @@ router.post("/", async (req, res) => {
         const user = await CreateUser({ username, password, email, code, name })
         return res.json(user)
     } catch (error) {
+        let errors = []
+        if (
+            error
+                .toString()
+                .includes(
+                    "MongoServerError: E11000 duplicate key error collection"
+                )
+        ) {
+            if (error.toString().includes("username")) {
+                errors = [...errors, "username has been use"]
+            }
+            if (error.toString().includes("email")) {
+                errors = [...errors, "email has been use"]
+            }
+        }
         res.json({
-            errors: [error.toString()],
+            errors,
         })
     }
 })
