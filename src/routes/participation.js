@@ -28,13 +28,16 @@ router.post(
         const { invitecode } = req.params
         try {
             const classroom = await GetClassByInviteCode(invitecode)
+            if (!classroom) {
+              throw "Invitecode does not exist"
+            }
             const { userId, name, isStudent, code } = req.body
             const isOwner = await IsOwner(user._id, classroom._id)
             
             if (userId && userId != user._id && !isOwner) {
                 throw "Not have right to add other user to this class"
             }
-
+            
             let participation
             if (userId) {
                 participation = await CreateParticipation({
