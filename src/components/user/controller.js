@@ -18,14 +18,7 @@ const GetUser = async (id) => {
 
 const GetUsersByClass = async (classId) => {
     const participations = await GetParticipationsByClass(classId)
-    let users = participations.map(async (p) => {
-        const user = await User.findById(p.userId)
-        user.isStudent = p.isStudent
-        return FilterUser(user)
-    })
-
-    users = Promise.all(users)
-    return users
+    return participations
 }
 
 const CreateUser = async ({ username, password, email, name }) => {
@@ -74,7 +67,7 @@ const DeleteUser = async (id) => {
 }
 
 const Login = async (username, password) => {
-    if (!username.includes('@')) {
+    if (!username.includes("@")) {
         const user = await User.findOne({ username })
         if (!user) {
             throw "User not exist"
@@ -85,10 +78,13 @@ const Login = async (username, password) => {
         }
         return user
     }
-    if (username.includes('@')) {
-        const verify = bcrypt.compareSync(process.env.LOGIN_BY_MAIL_SECRET, password)
+    if (username.includes("@")) {
+        const verify = bcrypt.compareSync(
+            process.env.LOGIN_BY_MAIL_SECRET,
+            password
+        )
         if (!verify) {
-            throw 'Verify error'
+            throw "Verify error"
         }
         const user = await User.findOne({ email: username })
         if (!user) {

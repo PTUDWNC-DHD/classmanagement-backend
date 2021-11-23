@@ -39,7 +39,11 @@ Get users of class
 *input* => (Authentication required with Bearer token)   
 **None**  
 *output* =>   
-List of users who join class  
+**classId**: Id of class  
+**userId**: Id of user if mapped with a account *not required*  
+**name**: Name of user  
+**isStudent**: **true** if student and **false** if teacher  
+**code**: Student code if student *not required*  
   
 ## User api
   
@@ -112,9 +116,9 @@ Add user into class
 *input* => (Authentication required with Bearer token)   
 **code**: Student code (*required* if **isStudent = true**)  
 **isStudent**: *true* if student and *false* if teacher  *required*  
-***DO NOT ADD BELOW IF REMOVE YOURSELF***  
-**userId**: id of user  
 **name**: Name to show in classes *required*  
+***DO NOT ADD BELOW IF ADD YOURSELF***  
+**userId**: id of user  
 *output* =>   
 Participations Info  
   
