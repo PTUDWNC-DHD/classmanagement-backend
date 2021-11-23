@@ -38,12 +38,16 @@ Class Info
 Get users of class  
 *input* => (Authentication required with Bearer token)   
 **None**  
-*output* =>   
-**classId**: Id of class  
-**userId**: Id of user if mapped with a account *not required*  
-**name**: Name of user  
-**isStudent**: **true** if student and **false** if teacher  
-**code**: Student code if student *not required*  
+*output* =>  
+**students**: List of student  
+    **classId**: Id of class  
+    **userId**: Id of user if mapped with a account *not required*  
+    **name**: Name of user   
+    **code**: Student code if student *not required*  
+**teachers**: List of student  
+    **classId**: Id of class  
+    **userId**: Id of user if mapped with a account *not required*  
+    **name**: Name of user   
   
 ## User api
   

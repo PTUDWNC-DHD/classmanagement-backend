@@ -16,8 +16,8 @@ const GetUser = async (id) => {
     return FilterUser(user)
 }
 
-const GetUsersByClass = async (classId) => {
-    const participations = await GetParticipationsByClass(classId)
+const GetUsersByClass = async (classId, isStudent = true) => {
+    const participations = await GetParticipationsByClass(classId, isStudent)
     return participations
 }
 

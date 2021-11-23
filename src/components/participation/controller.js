@@ -1,8 +1,9 @@
 const Participation = require("./model")
 
-const GetParticipationsByClass = async (classId) => {
+const GetParticipationsByClass = async (classId, isStudent) => {
     const participations = await Participation.find({
         classId,
+        isStudent,
     })
     return participations
 }
