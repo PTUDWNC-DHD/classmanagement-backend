@@ -3,7 +3,6 @@ const Participation = require("./model")
 const GetParticipationsByClass = async (classId) => {
     const participations = await Participation.find({
         classId,
-        isStudent: true,
     })
     return participations
 }
