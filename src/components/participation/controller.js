@@ -23,13 +23,22 @@ const CreateParticipation = async ({
     name,
     isStudent,
 }) => {
-    const participation = await Participation.create({
-        userId,
-        code,
-        name,
-        classId,
-        isStudent,
-    })
+    let participation = await Participation.findOne({ code })
+    if (!participation) {
+        participation = await Participation.create({
+            userId,
+            code,
+            name,
+            classId,
+            isStudent,
+        })
+    } else {
+        participation = await Participation.findByIdAndUpdate(
+            participation._id,
+            { userId, name },
+            { new: true }
+        )
+    }
     return participation
 }
 

@@ -79,6 +79,7 @@ ParticipationSchema.pre('findByIdAndUpdate', async function (next) {
         if (participation.userId) {
             throw "Student code have already been used by other user"
         }
+        next()
     }
 })
 
