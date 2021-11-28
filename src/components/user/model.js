@@ -40,7 +40,9 @@ const UserSchema = new mongoose.Schema({
         type: String,
         unique: true,
         sparse: true,
-
+    },
+    avatar: {
+        type: String,
     }
 })
 
@@ -51,6 +53,7 @@ UserSchema.pre('save', function (next) {
     else if (this.username && !this.password) {
         throw 'Must has password'
     }
+    next()
 })
 
 const User = mongoose.model("users", UserSchema)

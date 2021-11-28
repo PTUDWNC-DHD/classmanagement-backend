@@ -1,5 +1,6 @@
 const User = require("./model")
 const bcrypt = require("bcrypt")
+const firebaseApp = require("../../middleware/firebase")
 const {
     GetParticipationsByClass,
     GetParticipationsByUser,
@@ -21,11 +22,14 @@ const GetUsersByClass = async (classId, isStudent = true) => {
     return participations
 }
 
-const CreateUser = async ({ username, password, email, name }) => {
+const CreateUser = async ({ username, password, email, name, contact, studentID, avatar }) => {
     let data = {}
     username && (data.username = username)
     email && (data.email = email)
     name && (data.name = name)
+    contact && (data.contact = contact)
+    studentID && (data.studentID = studentID)
+    avatar && (data.avatar = avatar)
 
     if (password) {
         const saltRounds = 10
@@ -67,7 +71,7 @@ const DeleteUser = async (id) => {
 }
 
 const Login = async (username, password) => {
-    if (!username.includes("@")) {
+    if (!username.endsWith("@gmail.com")) {
         const user = await User.findOne({ username })
         if (!user) {
             throw "User not exist"
@@ -77,20 +81,24 @@ const Login = async (username, password) => {
             throw "Wrong password"
         }
         return user
-    }
-    if (username.includes("@")) {
-        const verify = bcrypt.compareSync(
-            process.env.LOGIN_BY_MAIL_SECRET,
-            password
-        )
-        if (!verify) {
-            throw "Verify error"
+    } else {
+        const idToken = password
+        const decoded = await firebaseApp.auth().verifyIdToken(idToken)
+        const fbUser = await firebaseApp.auth().getUser(decoded.uid)
+        if (fbUser) {
+            let user = await User.findOne({ email: fbUser.email })
+            if (user) {
+                return user
+            }
+            const data = {}
+            data.email = fbUser.email
+            data.name = fbUser.displayName
+            fbUser.phoneNumber ? (data.contact = fbUser.phoneNumber) : null
+            fbUser.photoURL ? (data.avatar = fbUser.photoURL) : null
+            user = await CreateUser(data)
+            return user
         }
-        const user = await User.findOne({ email: username })
-        if (!user) {
-            throw "User not exist"
-        }
-        return user
+        throw "Verify failed"
     }
 }
 
