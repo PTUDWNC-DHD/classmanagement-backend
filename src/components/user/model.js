@@ -36,7 +36,7 @@ const UserSchema = new mongoose.Schema({
     contact: {
         type: String,
     },
-    studentID: {
+    studentId: {
         type: String,
         unique: true,
         sparse: true,

@@ -6,6 +6,7 @@ const {
     GetParticipationsByUser,
     UpdateParticipation,
 } = require("../participation/controller")
+const { Promise } = require("mongoose")
 
 const FilterUser = (user) => {
     delete user?.password
@@ -19,16 +20,21 @@ const GetUser = async (id) => {
 
 const GetUsersByClass = async (classId, isStudent = true) => {
     const participations = await GetParticipationsByClass(classId, isStudent)
-    return participations
+    let users = participations.forEach(async p => {
+        return await User.findById(p.userId)
+    })
+    users = await Promise.all(users)
+    users = users.map(user => FilterUser(user))
+    return users
 }
 
-const CreateUser = async ({ username, password, email, name, contact, studentID, avatar }) => {
+const CreateUser = async ({ username, password, email, name, contact, studentId, avatar }) => {
     let data = {}
     username && (data.username = username)
     email && (data.email = email)
     name && (data.name = name)
     contact && (data.contact = contact)
-    studentID && (data.studentID = studentID)
+    studentId && (data.studentId = studentId)
     avatar && (data.avatar = avatar)
 
     if (password) {
@@ -55,19 +61,6 @@ const UpdateUser = async (id, data) => {
 
     const user = await User.findByIdAndUpdate(id, updatedData, { new: true })
     return FilterUser(user)
-}
-
-const DeleteUser = async (id) => {
-    const user = await User.findById(id)
-    console.log(user)
-    const participations = await GetParticipationsByUser(user._id)
-    console.log(participations)
-    const deleteProcess = participations.map(async (p) => {
-        await UpdateParticipation(p._id, { userId: null })
-    })
-    await Promise.all(deleteProcess)
-    await User.findByIdAndDelete(id)
-    return true
 }
 
 const Login = async (username, password) => {
@@ -107,6 +100,5 @@ module.exports = {
     GetUsersByClass,
     CreateUser,
     UpdateUser,
-    DeleteUser,
     Login,
 }
