@@ -1,10 +1,12 @@
 const User = require("./model")
 const bcrypt = require("bcrypt")
+const firebaseApp = require("../../middleware/firebase")
 const {
     GetParticipationsByClass,
     GetParticipationsByUser,
     UpdateParticipation,
 } = require("../participation/controller")
+const { Promise } = require("mongoose")
 
 const FilterUser = (user) => {
     delete user?.password
@@ -18,14 +20,22 @@ const GetUser = async (id) => {
 
 const GetUsersByClass = async (classId, isStudent = true) => {
     const participations = await GetParticipationsByClass(classId, isStudent)
-    return participations
+    let users = participations.forEach(async p => {
+        return await User.findById(p.userId)
+    })
+    users = await Promise.all(users)
+    users = users.map(user => FilterUser(user))
+    return users
 }
 
-const CreateUser = async ({ username, password, email, name }) => {
+const CreateUser = async ({ username, password, email, name, contact, studentId, avatar }) => {
     let data = {}
     username && (data.username = username)
     email && (data.email = email)
     name && (data.name = name)
+    contact && (data.contact = contact)
+    studentId && (data.studentId = studentId)
+    avatar && (data.avatar = avatar)
 
     if (password) {
         const saltRounds = 10
@@ -53,21 +63,8 @@ const UpdateUser = async (id, data) => {
     return FilterUser(user)
 }
 
-const DeleteUser = async (id) => {
-    const user = await User.findById(id)
-    console.log(user)
-    const participations = await GetParticipationsByUser(user._id)
-    console.log(participations)
-    const deleteProcess = participations.map(async (p) => {
-        await UpdateParticipation(p._id, { userId: null })
-    })
-    await Promise.all(deleteProcess)
-    await User.findByIdAndDelete(id)
-    return true
-}
-
 const Login = async (username, password) => {
-    if (!username.includes("@")) {
+    if (!username.endsWith("@gmail.com")) {
         const user = await User.findOne({ username })
         if (!user) {
             throw "User not exist"
@@ -77,20 +74,24 @@ const Login = async (username, password) => {
             throw "Wrong password"
         }
         return user
-    }
-    if (username.includes("@")) {
-        const verify = bcrypt.compareSync(
-            process.env.LOGIN_BY_MAIL_SECRET,
-            password
-        )
-        if (!verify) {
-            throw "Verify error"
+    } else {
+        const idToken = password
+        const decoded = await firebaseApp.auth().verifyIdToken(idToken)
+        const fbUser = await firebaseApp.auth().getUser(decoded.uid)
+        if (fbUser) {
+            let user = await User.findOne({ email: fbUser.email })
+            if (user) {
+                return user
+            }
+            const data = {}
+            data.email = fbUser.email
+            data.name = fbUser.displayName
+            fbUser.phoneNumber ? (data.contact = fbUser.phoneNumber) : null
+            fbUser.photoURL ? (data.avatar = fbUser.photoURL) : null
+            user = await CreateUser(data)
+            return user
         }
-        const user = await User.findOne({ email: username })
-        if (!user) {
-            throw "User not exist"
-        }
-        return user
+        throw "Verify failed"
     }
 }
 
@@ -99,6 +100,5 @@ module.exports = {
     GetUsersByClass,
     CreateUser,
     UpdateUser,
-    DeleteUser,
     Login,
 }

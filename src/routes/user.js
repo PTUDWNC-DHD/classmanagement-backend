@@ -75,22 +75,6 @@ router.patch(
     }
 )
 
-router.delete(
-    "/me",
-    passport.authenticate("jwt", { session: false }),
-    async (req, res) => {
-        const { user } = req
-        try {
-            const result = await DeleteUser(user._id)
-            return res.json(result)
-        } catch (error) {
-            res.json({
-                errors: [error.toString()],
-            })
-        }
-    }
-)
-
 router.get(
     "/me/classes",
     passport.authenticate("jwt", { session: false }),

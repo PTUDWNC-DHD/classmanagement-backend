@@ -4,6 +4,7 @@ const UserSchema = new mongoose.Schema({
     username: {
         type: String,
         unique: true,
+        sparse: true,
         validate: {
             validator: function (value) {
                 const re = /^[a-zA-Z0-9]*$/
@@ -11,15 +12,14 @@ const UserSchema = new mongoose.Schema({
             },
             message: "Username only contains char and num",
         },
-        required: true,
     },
     password: {
         type: String,
-        required: true,
     },
     email: {
         type: String,
         unique: true,
+        sparse: true,
         validate: {
             validator: function (value) {
                 const re =
@@ -28,12 +28,32 @@ const UserSchema = new mongoose.Schema({
             },
             message: "Invalid email",
         },
-        required: true,
     },
     name: {
         type: String,
         required: true,
     },
+    contact: {
+        type: String,
+    },
+    studentId: {
+        type: String,
+        unique: true,
+        sparse: true,
+    },
+    avatar: {
+        type: String,
+    }
+})
+
+UserSchema.pre('save', function (next) {
+    if (!this.username && !this.email) {
+        throw 'User must has username or email'
+    }
+    else if (this.username && !this.password) {
+        throw 'Must has password'
+    }
+    next()
 })
 
 const User = mongoose.model("users", UserSchema)
