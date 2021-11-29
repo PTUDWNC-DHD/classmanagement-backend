@@ -16,43 +16,12 @@ const GetParticipationsByUser = async (userId, isStudent = undefined) => {
     return participations
 }
 
-const CreateParticipation = async ({
-    classId,
-    userId,
-    code,
-    name,
-    isStudent,
-}) => {
-    let participation = await Participation.findOne({ code })
-    if (!participation) {
-        participation = await Participation.create({
-            userId,
-            code,
-            name,
-            classId,
-            isStudent,
-        })
-    } else {
-        participation = await Participation.findByIdAndUpdate(
-            participation._id,
-            { userId, name },
-            { new: true }
-        )
-    }
-    return participation
-}
-
-const UpdateParticipation = async (id, data) => {
-    let updatedData = {}
-    Object.keys(data).forEach((p) => {
-        Participation.schema.paths[p] && (updatedData[p] = data[p])
+const CreateParticipation = async ({ classId, userId, isStudent }) => {
+    const participation = await Participation.create({
+        classId,
+        userId,
+        isStudent,
     })
-
-    const participation = await Participation.findByIdAndUpdate(
-        id,
-        updatedData,
-        { new: true }
-    )
     return participation
 }
 
@@ -69,6 +38,5 @@ module.exports = {
     GetParticipationsByClass,
     GetParticipationsByUser,
     CreateParticipation,
-    UpdateParticipation,
     DeleteParticipation,
 }

@@ -20,7 +20,10 @@ const GetUser = async (id) => {
 
 const GetUsersByClass = async (classId, isStudent = true) => {
     const participations = await GetParticipationsByClass(classId, isStudent)
-    let users = participations.forEach(async p => {
+    if (participations.length == 0) {
+        return []
+    }
+    let users = participations.map(async p => {
         return await User.findById(p.userId)
     })
     users = await Promise.all(users)

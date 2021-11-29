@@ -20,6 +20,7 @@ const ParticipationSchema = new mongoose.Schema({
     isStudent: {
         type: Boolean,
         required: true,
+        default: true,
     },
     userId: {
         type: String,
@@ -32,55 +33,19 @@ const ParticipationSchema = new mongoose.Schema({
             },
             message: "UserId not exist",
         },
-    },
-    code: {
-        type: String,
-    },
-    name: {
-        type: String,
         required: true,
     },
 })
 
 ParticipationSchema.pre("save", async function (next) {
-    if (this.userId && this.classId) {
-        const participation = await Participation.findOne({
-            userId: this.userId,
-            classId: this.classId,
-        })
-        if (participation) {
-            throw "User have already been in class"
-        }
-    }
-    if (this.code && this.classId) {
-        const participation = await Participation.findOne({
-            code: this.code,
-            classId: this.classId,
-        })
-        if (participation) {
-            throw "Student code have already been used by other user"
-        }
-    }
-    if (this.isStudent && !this.code) {
-        throw "Student must have student code"
-    }
-    if (!this.userId && !this.code) {
-        throw "Paticipation must have userId or student code"
+    const participation = await Participation.findOne({
+        userId: this.userId,
+        classId: this.classId,
+    })
+    if (participation) {
+        throw "User have already been in class"
     }
     next()
-})
-
-ParticipationSchema.pre('findByIdAndUpdate', async function (next) {
-    if (this.code && this.classId) {
-        const participation = await Participation.findOne({
-            code: this.code,
-            classId: this.classId,
-        })
-        if (participation.userId) {
-            throw "Student code have already been used by other user"
-        }
-        next()
-    }
 })
 
 const Participation = mongoose.model("participations", ParticipationSchema)
