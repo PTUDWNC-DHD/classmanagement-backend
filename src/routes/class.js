@@ -71,8 +71,8 @@ router.patch(
                 throw "Not have right to modify this class"
             }
 
-            const { name, isEnded } = req.body
-            const classroom = await UpdateClass(id, { name, isEnded })
+            const { name, isEnded, invite, gradeStructure } = req.body
+            const classroom = await UpdateClass(id, { name, isEnded, invite, gradeStructure })
             return res.json(classroom)
         } catch (error) {
             res.json({
