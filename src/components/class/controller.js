@@ -42,7 +42,7 @@ const CreateClass = async ({ name, ownerId }) => {
 }
 
 const UpdateClass = async (id, data) => {
-    const classroom = await GetClass(id)
+    const classroom = await Class.findById(id)
     if (classroom.isEnded) {
         if (data.isEnded == false) {
             classroom.isEnded = false
@@ -51,8 +51,9 @@ const UpdateClass = async (id, data) => {
         }
         throw "Class is ended, cannot update data"
     }
-    const properties = Object.keys(Class)
-    properties.forEach(p => {
+    const properties = Object.keys(classroom._doc)
+    const [ _id, __v, ownerId, ...updateProperties ] = properties
+    updateProperties.forEach(p => {
         if (p != 'ownerId' && data[p] != undefined) {
             if (p == 'invite') {
                 classroom[p] = crypto.randomUUID()
