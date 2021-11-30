@@ -51,14 +51,18 @@ const UpdateClass = async (id, data) => {
         }
         throw "Class is ended, cannot update data"
     }
-    if (data.isEnded) {
-        classroom.isEnded = data.isEnded
-        classroom.save()
-    }
-    if (data.name) {
-        classroom.name = data.name
-        classroom.save()
-    }
+    const properties = Object.keys(Class)
+    properties.forEach(p => {
+        if (p != 'ownerId' && data[p] != undefined) {
+            if (p == 'invite') {
+                classroom[p] = crypto.randomUUID()
+            }
+            else {
+                classroom[p] = data[p]
+            }
+        }
+    })
+    classroom.save()
     return classroom
 }
 

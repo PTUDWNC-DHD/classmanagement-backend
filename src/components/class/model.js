@@ -28,7 +28,29 @@ const ClassSchema = new mongoose.Schema({
         type: Boolean,
         required: true,
         default: false,
-    }
+    },
+    gradeStructure: [
+        {
+            _id: {
+                type: mongoose.SchemaTypes.ObjectId,
+                auto: true,
+            },
+            name: {
+                type: String,
+                required: true,
+            },
+            range: {
+                type: Number,
+                required: true,
+                default: 100,
+            },
+            weight: {
+                type: Number,
+                required: true,
+                default: 1,
+            }
+        }
+    ]
 })
 
 const Class = mongoose.model("classes", ClassSchema)
