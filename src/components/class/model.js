@@ -39,11 +39,6 @@ const ClassSchema = new mongoose.Schema({
                 type: String,
                 required: true,
             },
-            range: {
-                type: Number,
-                required: true,
-                default: 100,
-            },
             weight: {
                 type: Number,
                 required: true,
