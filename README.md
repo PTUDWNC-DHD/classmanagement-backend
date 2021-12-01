@@ -1,5 +1,6 @@
 # Link host heroku server:
-[classroom-server-project.herokuapp.com](https://classroom-server-project.herokuapp.com/)
+Version 1: (BTN01)
+https://dhd-classmanagement-server-v1.herokuapp.com/
 
 # API
 ## Class api
