@@ -1,9 +1,8 @@
-const req = require("express/lib/request")
 const mongoose = require("mongoose")
 const User = require("../user/model")
 const Class = require("../class/model")
 
-const ParticipationSchema = new mongoose.Schema({
+const StudentSchema = new mongoose.Schema({
     classId: {
         type: String,
         validate: {
@@ -17,16 +16,11 @@ const ParticipationSchema = new mongoose.Schema({
         },
         required: true,
     },
-    isStudent: {
-        type: Boolean,
-        required: true,
-        default: true,
-    },
-    userId: {
+    studentId: {
         type: String,
         validate: {
             validator: async function (value) {
-                const user = await User.findById(value)
+                const user = await User.findOne({ studentId: value })
                 if (!user) {
                     throw new Error()
                 }
@@ -35,19 +29,29 @@ const ParticipationSchema = new mongoose.Schema({
         },
         required: true,
     },
+    name: {
+        type: String,
+        required: true,
+    },
+    grade: [
+        {
+            structureId: mongoose.SchemaTypes.ObjectId,
+            score: Number,
+        },
+    ],
 })
 
-ParticipationSchema.pre("save", async function (next) {
-    const participation = await Participation.findOne({
-        userId: this.userId,
+const Student = mongoose.model("Students", StudentSchema)
+
+StudentSchema.pre("save", async function (next) {
+    const Student = await Student.findOne({
+        studentId: this.studentId,
         classId: this.classId,
     })
-    if (participation) {
-        throw "User have already been in class"
+    if (Student) {
+        throw "StudentID have already registered in class"
     }
     next()
 })
 
-const Participation = mongoose.model("participations", ParticipationSchema)
-
-module.exports = Participation
+module.exports = Student
