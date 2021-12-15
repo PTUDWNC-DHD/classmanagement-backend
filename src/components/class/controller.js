@@ -1,9 +1,7 @@
 const crypto = require("crypto")
-const {
-    GetParticipationsByUser,
-    CreateParticipation,
-} = require("../participation/controller")
 const { GetUser } = require("../user/controller")
+const { GetStudentsByStudentId } = require("../student/controller")
+const { GetTeachersByUser, CreateTeacher } = require("../teacher/controller")
 const Class = require("./model")
 
 const GetClass = async (id) => {
@@ -16,27 +14,32 @@ const GetClassByInviteCode = async (code) => {
     return classroom
 }
 
-const GetClassesByUser = async (userId, isStudent = undefined) => {
-    const participations = await GetParticipationsByUser(userId, isStudent)
+const GetClassesByUser = async (userId) => {
+    const user = await GetUser(userId)
 
-    let classes = participations.map(async (p) => {
-        const classroom = await Class.findById(p.classId)
+    const students = await GetStudentsByStudentId(user.studentId)
+    const teachers = await GetTeachersByUser(userId)
+    
+    classes1 = students?.map(async (p) => {
+        const classroom = await GetClass(p.classId)
         return classroom
     })
 
-    classes = Promise.all(classes)
-    return classes
+    classes2 = teachers?.map(async (p) => {
+        const classroom = await GetClass(p.classId)
+        return classroom
+    })
+    classes1 = await Promise.all(classes1)
+    classes2 = await Promise.all(classes2)
+    return [...classes1, ...classes2]
 }
 
 const CreateClass = async ({ name, ownerId }) => {
     const invite = crypto.randomUUID()
     const classroom = await Class.create({ name, ownerId, invite })
-    const user = await GetUser(ownerId)
-    await CreateParticipation({
+    await CreateTeacher({
         classId: classroom._id,
         userId: ownerId,
-        name: user.name,
-        isStudent: false,
     })
     return classroom
 }
