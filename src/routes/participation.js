@@ -1,27 +1,20 @@
 const express = require("express")
-const { IsOwner, GetClassByInviteCode } = require("../components/class/controller")
 const {
-    CreateParticipation,
-    DeleteParticipation,
-} = require("../components/participation/controller")
-const Participation = require("../components/participation/model")
+    IsOwner,
+    GetClassByInviteCode,
+} = require("../components/class/controller")
+const { CreateStudent } = require("../components/student/controller")
+const { CreateTeacher } = require("../components/teacher/controller")
+const {
+    GetInvitation,
+    ConfirmInvitation,
+} = require("../components/invitation/controller")
 const passport = require("../middleware/passport")
 
 const router = new express.Router()
 
-router.get("/", async (req, res) => {
-    try {
-        const participations = await Participation.find()
-        return res.json(participations)
-    } catch (error) {
-        res.json({
-            errors: [error.toString()],
-        })
-    }
-})
-
 router.post(
-    "/:invitecode",
+    "/:invitecode/public",
     passport.authenticate("jwt", { session: false }),
     async (req, res) => {
         const { user } = req
@@ -29,43 +22,55 @@ router.post(
         try {
             const classroom = await GetClassByInviteCode(invitecode)
             if (!classroom) {
-              throw "Invitecode does not exist"
+                throw "Invitecode does not exist"
             }
-            const { userId, name, isStudent, code } = req.body
-            const isOwner = await IsOwner(user._id, classroom._id)
-            
-            if (userId && userId != user._id && !isOwner) {
-                throw "Not have right to add other user to this class"
-            }
-            
-            let participation
-            if (userId) {
-                participation = await CreateParticipation({
-                    userId,
-                    classId: classroom._id,
-                    isStudent,
-                    name,
-                    code,
-                })
-                return res.json(participation)
-            }
-            if (!isOwner) {
-                participation = await CreateParticipation({
-                    userId: user._id,
-                    classId: classroom._id,
-                    isStudent,
-                    name: user.name,
-                    code,
-                })
-                return res.json(participation)
-            }
-            participation = await CreateParticipation({
+
+            const student = await CreateStudent({
                 classId: classroom._id,
-                isStudent,
-                name,
-                code,
+                studentId: user._id,
+                name: user.name,
             })
-            return res.json(participation)
+            return student
+        } catch (error) {
+            res.json({
+                errors: [error.toString()],
+            })
+        }
+    }
+)
+
+router.post(
+    "/:invitecode/private",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { user } = req
+        const { invitecode } = req.params
+        try {
+            const invitation = await GetInvitation(invitecode)
+            if (!invitation) {
+                throw "Invitecode does not exist"
+            }
+
+            if (invitation.isAccepted != undefined) {
+                throw "Invitation has been confirmed"
+            }
+
+            if (invitation.isStudent) {
+                const student = await CreateStudent({
+                    classId: invitation.classId,
+                    studentId: user._id,
+                    name: user.name,
+                })
+                ConfirmInvitation(invitecode)
+                return res.json(student)
+            } else {
+                const teacher = await CreateTeacher({
+                    classId: invitation.classId,
+                    userId: user._id,
+                })
+                ConfirmInvitation(invitecode)
+                return res.json(teacher)
+            }
         } catch (error) {
             res.json({
                 errors: [error.toString()],
@@ -82,7 +87,7 @@ router.delete(
         try {
             const { userId, classId, code } = req.body
             const isOwner = await IsOwner(user._id, classId)
-            
+
             if (userId && userId != user._id && !isOwner) {
                 throw "Not have right to remove other user from this class"
             }
@@ -100,22 +105,6 @@ router.delete(
                 classId,
             })
             return res.json(result)
-        } catch (error) {
-            res.json({
-                errors: [error.toString()],
-            })
-        }
-    }
-)
-
-router.get(
-    "/:id",
-    passport.authenticate("jwt", { session: false }),
-    async (req, res) => {
-        try {
-            const { id } = req.params
-            const participation = await Participation.findOne(id)
-            return res.json(participation)
         } catch (error) {
             res.json({
                 errors: [error.toString()],

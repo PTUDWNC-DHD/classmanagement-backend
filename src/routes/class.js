@@ -91,11 +91,11 @@ router.get(
             let students = await GetUsersByClass(id, true)
             let teachers = await GetUsersByClass(id, false)
             students = students.map((student) => {
-                const { isStudent, __v, ...other } = student._doc
+                const { __v, ...other } = student._doc
                 return other
             })
             teachers = teachers.map((teacher) => {
-                const { isStudent, __v, ...other } = teacher._doc
+                const { __v, ...other } = teacher._doc
                 return other
             })
             return res.json({

@@ -1,5 +1,5 @@
 const express = require("express")
-const { GetClassByInviteCode } = require("../components/class/controller")
+const { GetClassByInviteCode, IsOwner } = require("../components/class/controller")
 const sendmail = require("../middleware/nodemailer")
 const passport = require("../middleware/passport")
 
@@ -10,13 +10,14 @@ router.post(
     passport.authenticate("jwt", { session: false }),
     async (req, res) => {
         const { user } = req
-        const { to, invitecode } = req.body
-        const classroom = await GetClassByInviteCode(invitecode)
-        if (classroom.ownerId == user._id) {
+        const { to, classId, isPublic, isStudent } = req.body
+        if (IsOwner(user._id, classId )) {
             await sendmail(
                 user,
                 to,
-                `${process.env.CLIENT_ADDRESS}classrooms/invitation/${invitecode}`
+                `${process.env.CLIENT_ADDRESS}classrooms/invitation/${invitecode}`,
+                isPublic,
+                isStudent
             )
             return res.send(true)
         }
