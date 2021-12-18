@@ -8,6 +8,8 @@ const {
     UpdateClass,
     IsOwner,
     AddGrade,
+    GetGradeStructure,
+    GetGrades,
 } = require("../components/class/controller")
 const Class = require("../components/class/model")
 const { GetUsersByClass } = require("../components/user/controller")
@@ -107,6 +109,22 @@ router.get(
                 students,
                 teachers,
             })
+        } catch (error) {
+            res.json({
+                errors: [error.toString()],
+            })
+        }
+    }
+)
+
+router.get(
+    "/:id/grades",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        try {
+            const { id } = req.params
+            const data = await GetGrades(id)
+            return res.json(data)
         } catch (error) {
             res.json({
                 errors: [error.toString()],

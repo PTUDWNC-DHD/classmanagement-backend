@@ -1,6 +1,6 @@
 const crypto = require("crypto")
 const { GetUser } = require("../user/controller")
-const { GetStudent, GetStudentsByStudentId } = require("../student/controller")
+const { GetStudent, GetStudentsByStudentId, GetStudentsByClass } = require("../student/controller")
 const { GetTeachersByUser, CreateTeacher } = require("../teacher/controller")
 const Class = require("./model")
 
@@ -94,6 +94,42 @@ const AddGrade = async ({ studentId, classId, gradeId, score }) => {
     student.save()
 }
 
+const GetGradeStructure = async (classId) => {
+    const classroom = await GetClass(classId)
+    if (!classroom) {
+        throw "Class not exist"
+    }
+    return classroom.gradeStructure
+}
+
+const GetGrades = async (classId) => {
+    const classroom = await GetClass(classId)
+    if (!classroom) {
+        throw "Class not exist"
+    }
+    const students = await GetStudentsByClass(classId)
+    const studentIds = students.map(student => student.studentId)
+    const structureIds = classroom.gradeStructure?.map(grade => grade._id)
+    console.log(studentIds);
+    console.log(structureIds);
+    const grades = {} 
+    students.forEach(student => {
+        const res = {}
+        if (student.grade) {
+            student.grade.forEach(grade => {
+                res[grade.structureId] = grade.score;
+            })
+            structureIds.forEach(structureId => {
+                if (!res[structureId]) {
+                    res[structureId] = 0
+                }
+            })
+        }
+        grades[student.studentId] = res
+    })
+    return {studentIds, structureIds, grades}
+}
+
 module.exports = {
     GetClass,
     GetClassByInviteCode,
@@ -101,5 +137,7 @@ module.exports = {
     CreateClass,
     UpdateClass,
     IsOwner,
+    GetGradeStructure,
     AddGrade,
+    GetGrades,
 }
