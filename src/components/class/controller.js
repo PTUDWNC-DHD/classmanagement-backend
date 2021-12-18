@@ -1,6 +1,6 @@
 const crypto = require("crypto")
 const { GetUser } = require("../user/controller")
-const { GetStudentsByStudentId } = require("../student/controller")
+const { GetStudent, GetStudentsByStudentId } = require("../student/controller")
 const { GetTeachersByUser, CreateTeacher } = require("../teacher/controller")
 const Class = require("./model")
 
@@ -75,6 +75,25 @@ const IsOwner = async (userId, classId) => {
     return userId == classroom.ownerId
 }
 
+const AddGrade = async ({ studentId, classId, gradeId, score }) => {
+    const student = await GetStudent({studentId, classId})
+    if (!student) {
+        throw "Student not exist"
+    }
+    let flag = false
+    if (student.grade && student.grade.length != 0) {
+        student.grade.some(g => {
+            if (g.structureId == gradeId) {
+                g.score = score
+                flag = true
+                return true
+            }
+        })
+    }
+    if (!flag) student.grade.push({ structureId: gradeId, score })
+    student.save()
+}
+
 module.exports = {
     GetClass,
     GetClassByInviteCode,
@@ -82,4 +101,5 @@ module.exports = {
     CreateClass,
     UpdateClass,
     IsOwner,
+    AddGrade,
 }

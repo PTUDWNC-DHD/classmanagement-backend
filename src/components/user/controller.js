@@ -21,27 +21,28 @@ const GetUsersByClass = async (classId, isStudent = true) => {
         if (students.length == 0) {
             return []
         }
-        users = students.map(async p => {
+        const processes = students.map(async p => {
             const user = await User.findOne({ studentId: p.studentId })
             if (user) {
-                return user
+                users.push(user)
             }
-        })
+        await Promise.all(processes)
+    })
     }
     else {
         const teachers = await GetTeachersByClass(classId)
         if (teachers.length == 0) {
             return []
         }
-        users = teachers.map(async p => {
+        const processes = teachers.map(async p => {
             const user = await User.findOne({ userId: p.userId })
             if (user) {
-                return user
+                users.push(user)
             }
         })
+        await Promise.all(processes)
     }
 
-    users = await Promise.all(users)
     users = users.map(user => FilterUser(user))
     return users
 }

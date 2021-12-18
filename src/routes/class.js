@@ -1,13 +1,18 @@
 const express = require("express")
+const multer = require("multer")
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage }).single("filecsv")
 const {
     CreateClass,
     GetClass,
     UpdateClass,
     IsOwner,
+    AddGrade,
 } = require("../components/class/controller")
 const Class = require("../components/class/model")
 const { GetUsersByClass } = require("../components/user/controller")
 const passport = require("../middleware/passport")
+const readCSV = require("../middleware/read-csv")
 
 const router = new express.Router()
 
@@ -102,6 +107,31 @@ router.get(
                 students,
                 teachers,
             })
+        } catch (error) {
+            res.json({
+                errors: [error.toString()],
+            })
+        }
+    }
+)
+
+router.post(
+    "/:id/:gradeId/addgrade",
+    upload,
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { id, gradeId } = req.params
+        const importFile = req.file
+        try {
+            if (!importFile) {
+                throw "Please import file"
+            }
+            const data = await readCSV(importFile)
+            const processes = data.map(async grade => {
+                return await AddGrade({ ...grade, classId: id, gradeId })
+            });
+            await Promise.all(processes)
+            return res.send()
         } catch (error) {
             res.json({
                 errors: [error.toString()],
