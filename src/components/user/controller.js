@@ -35,7 +35,7 @@ const GetUsersByClass = async (classId, isStudent = true) => {
             return []
         }
         const processes = teachers.map(async p => {
-            const user = await User.findOne({ userId: p.userId })
+            const user = await User.findById(p.userId)
             if (user) {
                 users.push(user)
             }
