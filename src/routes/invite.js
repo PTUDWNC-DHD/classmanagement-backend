@@ -15,7 +15,7 @@ router.post(
             await sendmail(
                 user,
                 to,
-                `${process.env.CLIENT_ADDRESS}classrooms/invitation/${invitecode}`,
+                classId,
                 isPublic,
                 isStudent
             )
