@@ -89,11 +89,10 @@ const GetGrades = async (classId) => {
         throw "Class not exist"
     }
     const students = await GetStudentsByClass(classId)
-    const gradeStructure = classroom.gradeStructure
+    const structureIds = classroom.gradeStructure?.map(grade => grade._id)
     const grades = {} 
     students.forEach(student => {
-        const res = {}
-        const structureIds = gradeStructure?.map(grade => grade._id)
+        const res = { name: student.name}
         if (student.grade) {
             student.grade.forEach(grade => {
                 res[grade.structureId] = grade.score;
@@ -106,7 +105,7 @@ const GetGrades = async (classId) => {
         }
         grades[student.studentId] = res
     })
-    return {students, gradeStructure, grades}
+    return grades
 }
 
 module.exports = {
