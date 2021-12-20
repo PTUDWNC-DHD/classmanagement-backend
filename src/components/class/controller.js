@@ -75,25 +75,6 @@ const IsOwner = async (userId, classId) => {
     return userId == classroom.ownerId
 }
 
-const AddGrade = async ({ studentId, classId, gradeId, score }) => {
-    const student = await GetStudent({studentId, classId})
-    if (!student) {
-        throw "Student not exist"
-    }
-    let flag = false
-    if (student.grade && student.grade.length != 0) {
-        student.grade.some(g => {
-            if (g.structureId == gradeId) {
-                g.score = score
-                flag = true
-                return true
-            }
-        })
-    }
-    if (!flag) student.grade.push({ structureId: gradeId, score })
-    student.save()
-}
-
 const GetGradeStructure = async (classId) => {
     const classroom = await GetClass(classId)
     if (!classroom) {
@@ -109,12 +90,11 @@ const GetGrades = async (classId) => {
     }
     const students = await GetStudentsByClass(classId)
     const studentIds = students.map(student => student.studentId)
-    const structureIds = classroom.gradeStructure?.map(grade => grade._id)
-    console.log(studentIds);
-    console.log(structureIds);
+    const gradeStructure = classroom.gradeStructure
     const grades = {} 
     students.forEach(student => {
         const res = {}
+        const structureIds = gradeStructure?.map(grade => grade._id)
         if (student.grade) {
             student.grade.forEach(grade => {
                 res[grade.structureId] = grade.score;
@@ -127,7 +107,7 @@ const GetGrades = async (classId) => {
         }
         grades[student.studentId] = res
     })
-    return {studentIds, structureIds, grades}
+    return {studentIds, gradeStructure, grades}
 }
 
 module.exports = {
@@ -138,6 +118,5 @@ module.exports = {
     UpdateClass,
     IsOwner,
     GetGradeStructure,
-    AddGrade,
     GetGrades,
 }

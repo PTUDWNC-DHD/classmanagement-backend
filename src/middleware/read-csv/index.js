@@ -1,9 +1,28 @@
 const { parse } = require("csv-parse/sync")
 
-const readCSV = async (file) => {
+const readScore = async (file) => {
     let dataString = file.buffer.toString("utf8")
-    const data = parse(dataString, { columns: ['studentId', 'score'] })
+    const data = parse(
+        dataString, 
+        { 
+            columns: true //['studentId', 'score'] 
+        }
+    )
     return data
 }
 
-module.exports = readCSV
+const readStudent = async (file) => {
+    let dataString = file.buffer.toString("utf8")
+    const data = parse(
+        dataString, 
+        { 
+            columns: true //['studentId', 'name'] 
+        }
+    )
+    return data
+}
+
+module.exports = {
+    readScore,
+    readStudent,
+}

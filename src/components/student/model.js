@@ -18,15 +18,6 @@ const StudentSchema = new mongoose.Schema({
     },
     studentId: {
         type: String,
-        validate: {
-            validator: async function (value) {
-                const user = await User.findOne({ studentId: value })
-                if (!user) {
-                    throw new Error()
-                }
-            },
-            message: "UserId not exist",
-        },
         required: true,
     },
     name: {

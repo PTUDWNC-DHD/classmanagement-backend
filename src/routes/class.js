@@ -7,14 +7,13 @@ const {
     GetClass,
     UpdateClass,
     IsOwner,
-    AddGrade,
-    GetGradeStructure,
     GetGrades,
 } = require("../components/class/controller")
 const Class = require("../components/class/model")
+const { AddGrade, CreateStudent } = require("../components/student/controller")
 const { GetUsersByClass } = require("../components/user/controller")
 const passport = require("../middleware/passport")
-const readCSV = require("../middleware/read-csv")
+const { readScore, readStudent } = require("../middleware/read-csv")
 
 const router = new express.Router()
 
@@ -117,6 +116,39 @@ router.get(
     }
 )
 
+router.post(
+    "/:id/addstudents", 
+    upload, 
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { id } = req.params
+        const importFile = req.file
+        try {
+            if (!importFile) {
+                throw "Please import file"
+            }
+            const data = await readStudent(importFile)
+            const errors = []
+            const processes = data.map(async student => {
+                try {
+                    return await CreateStudent({ ...student, classId: id })
+                } catch (error) {
+                    errors.push(error)
+                }
+            });
+            await Promise.all(processes)
+            if (errors.length != 0) {
+                return res.json({ errors })
+            }
+            return res.send()
+        } catch (error) {
+            return res.json({
+                errors: [error.toString()],
+            })
+        }
+    }
+)
+
 router.get(
     "/:id/grades",
     passport.authenticate("jwt", { session: false }),
@@ -134,7 +166,7 @@ router.get(
 )
 
 router.post(
-    "/:id/:gradeId/addgrade",
+    "/:id/:gradeId/addgrades",
     upload,
     passport.authenticate("jwt", { session: false }),
     async (req, res) => {
@@ -144,14 +176,22 @@ router.post(
             if (!importFile) {
                 throw "Please import file"
             }
-            const data = await readCSV(importFile)
+            const data = await readScore(importFile)
+            const errors = []
             const processes = data.map(async grade => {
-                return await AddGrade({ ...grade, classId: id, gradeId })
+                try {
+                    return await AddGrade({ ...grade, classId: id, gradeId })
+                } catch (error) {
+                    errors.push(error.toString())
+                }
             });
             await Promise.all(processes)
+            if (errors.length != 0) {
+                return res.json({ errors })
+            }
             return res.send()
         } catch (error) {
-            res.json({
+            return res.json({
                 errors: [error.toString()],
             })
         }
