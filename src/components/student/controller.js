@@ -16,8 +16,8 @@ const GetStudentsByStudentId = async (studentId) => {
 }
 
 const CreateStudent = async ({ classId, studentId, name }) => {
-    const Student = await Student.create({ classId, studentId, name })
-    return Student
+    const student = await Student.create({ classId, studentId, name })
+    return student
 }
 
 const DeleteStudent = async ({ classId, studentId }) => {

@@ -14,10 +14,10 @@ async function SendInviteMail(fromUser, toEmail, classId, isPublic, isStudent) {
     })
 
     // Create link invite
-    let link
+    let link = `${process.env.CLIENT_ADDRESS}classrooms/invitation/`
     if (isPublic) {
         const classroom = await GetClass(classId)
-        link = `${process.env.CLIENT_ADDRESS}classrooms/invitation/${classroom.invite}/${isPublic ? 'public' : 'private'}`
+        const publicLink = link + `${classroom.invite}/public`
 
         // send mail with defined transport object
         await transporter.sendMail({
@@ -26,10 +26,10 @@ async function SendInviteMail(fromUser, toEmail, classId, isPublic, isStudent) {
             subject: "An invitation to new class", // Subject line
             text: `Hello, ${fromUser.name}<${fromUser.email}> has invited you to join his class
         Please go to link below to accept join class:
-        ${link}`, // plain text body
+        ${publicLink}`, // plain text body
             html: `Hello, <strong>${fromUser.name}</strong><${fromUser.email}> has invited you to join his class<br>
         Please go to link below to accept join class:<br>
-        <link>${link}</link>`, // html body
+        <link>${publicLink}</link>`, // html body
         })
     } else {
         const process = toEmail.map(async (email) => {
@@ -38,7 +38,7 @@ async function SendInviteMail(fromUser, toEmail, classId, isPublic, isStudent) {
                 email,
                 isStudent,
             })
-            link = `${process.env.CLIENT_ADDRESS}classrooms/invitation/${invitation.code}`
+            const privateLink = link + `${invitation.code}/private`
 
             // send mail with defined transport object
             await transporter.sendMail({
@@ -47,10 +47,10 @@ async function SendInviteMail(fromUser, toEmail, classId, isPublic, isStudent) {
                 subject: "An invitation to new class", // Subject line
                 text: `Hello, ${fromUser.name}<${fromUser.email}> has invited you to join his class
             Please go to link below to accept join class:
-            ${link}`, // plain text body
+            ${privateLink}`, // plain text body
                 html: `Hello, <strong>${fromUser.name}</strong><${fromUser.email}> has invited you to join his class<br>
             Please go to link below to accept join class:<br>
-            <link>${link}</link>`, // html body
+            <link>${privateLink}</link>`, // html body
             })
         })
 

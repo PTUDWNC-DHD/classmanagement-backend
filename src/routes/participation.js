@@ -27,10 +27,10 @@ router.post(
 
             const student = await CreateStudent({
                 classId: classroom._id,
-                studentId: user._id,
+                studentId: user.studentId,
                 name: user.name,
             })
-            return student
+            return res.json(student)
         } catch (error) {
             res.json({
                 errors: [error.toString()],
