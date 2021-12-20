@@ -17,7 +17,7 @@ async function SendInviteMail(fromUser, toEmail, classId, isPublic, isStudent) {
     let link
     if (isPublic) {
         const classroom = await GetClass(classId)
-        link = `${process.env.CLIENT_ADDRESS}classrooms/invitation/${classroom.invite}`
+        link = `${process.env.CLIENT_ADDRESS}classrooms/invitation/${classroom.invite}/${isPublic ? 'public' : 'private'}`
 
         // send mail with defined transport object
         await transporter.sendMail({
