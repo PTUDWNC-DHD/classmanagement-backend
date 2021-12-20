@@ -149,6 +149,23 @@ router.post(
     }
 )
 
+router.post(
+    "/:id/addstudent",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { id } = req.params
+        const { studentId, name } = req.body
+        try {
+            const student = await CreateStudent({ studentId, name, classId: id })
+            return res.send(student)
+        } catch (error) {
+            return res.json({
+                errors: [error.toString()],
+            })
+        }
+    }
+)
+
 router.get(
     "/:id/grades",
     passport.authenticate("jwt", { session: false }),
@@ -159,6 +176,23 @@ router.get(
             return res.json(data)
         } catch (error) {
             res.json({
+                errors: [error.toString()],
+            })
+        }
+    }
+)
+
+router.post(
+    "/:id/:gradeId/addgrade",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const { id, gradeId } = req.params
+        const { studentId, score } = req.body
+        try {
+            await AddGrade({ studentId, classId: id, gradeId, score })
+            return res.send()
+        } catch (error) {
+            return res.json({
                 errors: [error.toString()],
             })
         }
