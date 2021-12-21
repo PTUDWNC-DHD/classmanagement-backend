@@ -140,7 +140,7 @@ router.post(
             if (errors.length != 0) {
                 return res.json({ errors })
             }
-            return res.send()
+            return res.send({ added: true })
         } catch (error) {
             return res.json({
                 errors: [error.toString()],
@@ -156,8 +156,8 @@ router.post(
         const { id } = req.params
         const { studentId, name } = req.body
         try {
-            const student = await CreateStudent({ studentId, name, classId: id })
-            return res.send(student)
+            await CreateStudent({ studentId, name, classId: id })
+            return res.send({ added: true })
         } catch (error) {
             return res.json({
                 errors: [error.toString()],
@@ -190,7 +190,7 @@ router.post(
         const { studentId, score } = req.body
         try {
             await AddGrade({ studentId, classId: id, gradeId, score })
-            return res.send()
+            return res.send({ added: true })
         } catch (error) {
             return res.json({
                 errors: [error.toString()],
@@ -223,7 +223,7 @@ router.post(
             if (errors.length != 0) {
                 return res.json({ errors })
             }
-            return res.send()
+            return res.send({ added: true })
         } catch (error) {
             return res.json({
                 errors: [error.toString()],

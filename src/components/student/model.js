@@ -35,11 +35,11 @@ const StudentSchema = new mongoose.Schema({
 const Student = mongoose.model("Students", StudentSchema)
 
 StudentSchema.pre("save", async function (next) {
-    const Student = await Student.findOne({
+    const student = await Student.findOne({
         studentId: this.studentId,
         classId: this.classId,
     })
-    if (Student) {
+    if (student) {
         throw "StudentID have already registered in class"
     }
     next()
