@@ -4,7 +4,6 @@ const {
     CreateUser,
     GetUser,
     UpdateUser,
-    DeleteUser,
 } = require("../components/user/controller")
 const User = require("../components/user/model")
 const passport = require("../middleware/passport")

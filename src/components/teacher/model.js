@@ -1,9 +1,8 @@
-const req = require("express/lib/request")
 const mongoose = require("mongoose")
 const User = require("../user/model")
 const Class = require("../class/model")
 
-const ParticipationSchema = new mongoose.Schema({
+const TeacherSchema = new mongoose.Schema({
     classId: {
         type: String,
         validate: {
@@ -16,11 +15,6 @@ const ParticipationSchema = new mongoose.Schema({
             message: "ClassId not exist",
         },
         required: true,
-    },
-    isStudent: {
-        type: Boolean,
-        required: true,
-        default: true,
     },
     userId: {
         type: String,
@@ -37,17 +31,16 @@ const ParticipationSchema = new mongoose.Schema({
     },
 })
 
-ParticipationSchema.pre("save", async function (next) {
-    const participation = await Participation.findOne({
+const Teacher = mongoose.model("Teachers", TeacherSchema)
+
+TeacherSchema.pre("save", async function (next) {
+    const Teacher = await Teacher.findOne({
         userId: this.userId,
         classId: this.classId,
     })
-    if (participation) {
-        throw "User have already been in class"
+    if (Teacher) {
+        throw "User have already registered as teacher in class"
     }
     next()
 })
-
-const Participation = mongoose.model("participations", ParticipationSchema)
-
-module.exports = Participation
+module.exports = Teacher

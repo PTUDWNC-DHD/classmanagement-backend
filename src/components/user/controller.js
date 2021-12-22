@@ -1,12 +1,8 @@
 const User = require("./model")
 const bcrypt = require("bcrypt")
 const firebaseApp = require("../../middleware/firebase")
-const {
-    GetParticipationsByClass,
-    GetParticipationsByUser,
-    UpdateParticipation,
-} = require("../participation/controller")
-const { Promise } = require("mongoose")
+const { GetStudentsByClass } = require("../student/controller")
+const { GetTeachersByClass } = require("../teacher/controller")
 
 const FilterUser = (user) => {
     delete user?.password
@@ -19,14 +15,34 @@ const GetUser = async (id) => {
 }
 
 const GetUsersByClass = async (classId, isStudent = true) => {
-    const participations = await GetParticipationsByClass(classId, isStudent)
-    if (participations.length == 0) {
-        return []
-    }
-    let users = participations.map(async p => {
-        return await User.findById(p.userId)
+    let users = []
+    if (isStudent) {
+        const students = await GetStudentsByClass(classId)
+        if (students.length == 0) {
+            return []
+        }
+        const processes = students.map(async p => {
+            const user = await User.findOne({ studentId: p.studentId })
+            if (user) {
+                users.push(user)
+            }
+        await Promise.all(processes)
     })
-    users = await Promise.all(users)
+    }
+    else {
+        const teachers = await GetTeachersByClass(classId)
+        if (teachers.length == 0) {
+            return []
+        }
+        const processes = teachers.map(async p => {
+            const user = await User.findById(p.userId)
+            if (user) {
+                users.push(user)
+            }
+        })
+        await Promise.all(processes)
+    }
+
     users = users.map(user => FilterUser(user))
     return users
 }
