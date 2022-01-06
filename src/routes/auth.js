@@ -10,7 +10,7 @@ const User = require("../components/user/model")
 const router = new express.Router()
 
 router.post(
-    "/",
+    "/login",
     passport.authenticate("local", { session: false }),
     function (req, res) {
         return res.json({
