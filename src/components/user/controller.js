@@ -57,7 +57,7 @@ const GetUsersByClass = async (classId, isStudent = true) => {
     return users
 }
 
-const CreateUser = async ({ username, password, email, name, contact, studentId, avatar }) => {
+const CreateUser = async ({ username, password, email, name, contact, studentId, avatar, isActive = false }) => {
     let data = {}
     username && (data.username = username)
     email && (data.email = email)
@@ -65,7 +65,8 @@ const CreateUser = async ({ username, password, email, name, contact, studentId,
     contact && (data.contact = contact)
     studentId && (data.studentId = studentId)
     avatar && (data.avatar = avatar)
-
+    data.isActive = isActive
+    
     if (password) {
         const saltRounds = 10
         const hashPassword = bcrypt.hashSync(password, saltRounds)
@@ -102,6 +103,9 @@ const Login = async (username, password) => {
         if (!comparePass) {
             throw "Wrong password"
         }
+        if (!user.isActive) {
+            throw "Account not active yet"
+        }
         return user
     } else {
         const idToken = password
@@ -111,7 +115,7 @@ const Login = async (username, password) => {
             let user = await User.findOne({ email: fbUser.email })
             if (user) {
                 if (!user.isActive) {
-                    throw "Please active your account"
+                    throw "Account not active yet"
                 }
                 return user
             }
