@@ -22,7 +22,7 @@ router.post(
     }
 )
 
-router.post("/forgotpassword", function (req, res) {
+router.post("/forgotpassword", async function (req, res) {
     try {
         const { email } = req.body
         const code = await CreateCode(email, typeCodeEnum.RESET_PASSWORD)
@@ -38,7 +38,7 @@ router.post("/forgotpassword", function (req, res) {
     }
 })
 
-router.post("/active", function (req, res) {
+router.post("/active", async function (req, res) {
     try {
         const { email, code } = req.body
         const isChecked = await CheckCode(email, typeCodeEnum.ACTIVE_ACCOUNT, code)
@@ -57,7 +57,7 @@ router.post("/active", function (req, res) {
     }
 })
 
-router.post("/checkresetpasswordcode", function (req, res) {
+router.post("/checkresetpasswordcode", async function (req, res) {
     try {
         const { email, code } = req.body
         const isChecked = await CheckCode(email, typeCodeEnum.RESET_PASSWORD, code)
@@ -80,7 +80,7 @@ router.post("/checkresetpasswordcode", function (req, res) {
     }
 })
 
-router.post("/resetpassword", function (req, res) {
+router.post("/resetpassword", async function (req, res) {
     try {
         const { token, password } = req.body
         if (isChecked) {
