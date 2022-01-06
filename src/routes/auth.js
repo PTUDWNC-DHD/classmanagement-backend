@@ -1,6 +1,11 @@
 const express = require("express")
 const passport = require("../middleware/passport")
 const jwt = require("jsonwebtoken")
+const { CreateCode, CheckCode } = require("../components/code/controller")
+const typeCodeEnum = require("../components/code/type-code-enum")
+const { SendResetPassCodeMail } = require("../middleware/nodemailer")
+const { UpdateUser, GetUserByEmail } = require("../components/user/controller")
+const User = require("../components/user/model")
 
 const router = new express.Router()
 
@@ -16,5 +21,86 @@ router.post(
         })
     }
 )
+
+router.post("/forgotpassword", function (req, res) {
+    try {
+        const { email } = req.body
+        const code = await CreateCode(email, typeCodeEnum.RESET_PASSWORD)
+        await SendResetPassCodeMail(email, code.code)
+        return res.json({
+            result: true,
+        })
+    } catch (error) {
+        return res.status(400).json({
+            result: false,
+            errors: [error.toString()]
+        })
+    }
+})
+
+router.post("/active", function (req, res) {
+    try {
+        const { email, code } = req.body
+        const isChecked = await CheckCode(email, typeCodeEnum.ACTIVE_ACCOUNT, code)
+        if (isChecked) {
+            const user = await GetUserByEmail(email)
+            await UpdateUser(user._id, { isActive: true })
+        }
+        return res.json({
+            result: true,
+        })
+    } catch (error) {
+        return res.status(400).json({
+            result: false,
+            errors: [error.toString()]
+        })
+    }
+})
+
+router.post("/checkresetpasswordcode", function (req, res) {
+    try {
+        const { email, code } = req.body
+        const isChecked = await CheckCode(email, typeCodeEnum.RESET_PASSWORD, code)
+        if (isChecked) {
+            const user = await User.findOne({ email })
+            const token = jwt.sign({
+                email: email,
+                password: user.password,
+            }, "dhdresetpassword", { expiresIn: "1h" })
+            return res.json({
+                result: true,
+                token,
+            })
+        }
+    } catch (error) {
+        return res.status(400).json({
+            result: false,
+            errors: [error.toString()]
+        })
+    }
+})
+
+router.post("/resetpassword", function (req, res) {
+    try {
+        const { token, password } = req.body
+        if (isChecked) {
+            const decoded = jwt.verify(token, "dhdresetpassword")
+            const user = await User.findOne({ email: decoded.email, password: decoded.password })
+            if (!user) {
+                throw "Token wrong"
+            }
+            await UpdateUser(user._id, { password })
+            return res.json({
+                result: true,
+                token,
+            })
+        }
+    } catch (error) {
+        return res.status(400).json({
+            result: false,
+            errors: [error.toString()]
+        })
+    }
+})
 
 module.exports = router

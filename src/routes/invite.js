@@ -1,6 +1,6 @@
 const express = require("express")
 const { GetClassByInviteCode, IsOwner } = require("../components/class/controller")
-const sendmail = require("../middleware/nodemailer")
+const { SendInviteMail } = require("../middleware/nodemailer")
 const passport = require("../middleware/passport")
 
 const router = new express.Router()
@@ -12,7 +12,7 @@ router.post(
         const { user } = req
         const { to, classId, isPublic, isStudent } = req.body
         if (IsOwner(user._id, classId )) {
-            await sendmail(
+            await SendInviteMail(
                 user,
                 to,
                 classId,

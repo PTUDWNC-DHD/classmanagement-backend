@@ -14,6 +14,16 @@ const GetUser = async (id) => {
     return FilterUser(user)
 }
 
+const GetUserByStudentId = async (studentId) => {
+    const user = await User.findOne({ studentId })
+    return FilterUser(user)
+}
+
+const GetUserByEmail = async (email) => {
+    const user = await User.findOne({ email })
+    return FilterUser(user)
+}
+
 const GetUsersByClass = async (classId, isStudent = true) => {
     let users = []
     if (isStudent) {
@@ -100,6 +110,9 @@ const Login = async (username, password) => {
         if (fbUser) {
             let user = await User.findOne({ email: fbUser.email })
             if (user) {
+                if (!user.isActive) {
+                    throw "Please active your account"
+                }
                 return user
             }
             const data = {}
@@ -107,6 +120,7 @@ const Login = async (username, password) => {
             data.name = fbUser.displayName
             fbUser.phoneNumber ? (data.contact = fbUser.phoneNumber) : null
             fbUser.photoURL ? (data.avatar = fbUser.photoURL) : null
+            data.isActive = true
             user = await CreateUser(data)
             return user
         }
@@ -116,6 +130,8 @@ const Login = async (username, password) => {
 
 module.exports = {
     GetUser,
+    GetUserByStudentId,
+    GetUserByEmail,
     GetUsersByClass,
     CreateUser,
     UpdateUser,

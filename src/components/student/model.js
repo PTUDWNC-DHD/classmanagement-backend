@@ -1,5 +1,4 @@
 const mongoose = require("mongoose")
-const User = require("../user/model")
 const Class = require("../class/model")
 
 const StudentSchema = new mongoose.Schema({
