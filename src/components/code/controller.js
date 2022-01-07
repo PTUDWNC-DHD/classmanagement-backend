@@ -1,4 +1,5 @@
 const crypto = require("crypto")
+const { GetUserByEmail } = require("../user/controller")
 const Code = require("./model")
 
 const GetCode = async (email, code) => {
@@ -10,11 +11,15 @@ const GetCode = async (email, code) => {
 }
 
 const CreateCode = async (email, type) => {
+    const user = await GetUserByEmail(email)
+    if (!user) {
+        throw "This email hasn't been registered yet"
+    }
     let code = ""
     for (let i = 0; i < 5; i++) {
         code = code + crypto.randomInt(10).toString()
     }
-    const newCode = await Code.create({ code, email, type })
+    const newCode = await Code.create({ code, email, type, expiredAt: new Date(Date.now() + 5 * 60 * 1000) })
     return newCode
 }
 
@@ -53,7 +58,9 @@ const CheckCode = async (email, type, code) => {
     }
     existCode.isUsed = true
     await existCode.save()
-    return true
+    return {
+        result: true
+    }
 }
 
 module.exports = {
