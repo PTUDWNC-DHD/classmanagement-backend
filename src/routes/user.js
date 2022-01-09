@@ -7,6 +7,9 @@ const {
 } = require("../components/user/controller")
 const User = require("../components/user/model")
 const passport = require("../middleware/passport")
+const { CreateCode } = require("../components/code/controller")
+const typeCodeEnum = require("../components/code/type-code-enum")
+const { SendActiveCodeMail } = require("../middleware/nodemailer")
 
 const router = new express.Router()
 
@@ -25,6 +28,8 @@ router.post("/", async (req, res) => {
     const { username, password, email, code, name } = req.body
     try {
         const user = await CreateUser({ username, password, email, code, name })
+        const activecode = await CreateCode(email, typeCodeEnum.ACTIVE_ACCOUNT)
+        await SendActiveCodeMail(email, activecode.code)
         return res.json(user)
     } catch (error) {
         let errors = []

@@ -14,6 +14,16 @@ const GetUser = async (id) => {
     return FilterUser(user)
 }
 
+const GetUserByStudentId = async (studentId) => {
+    const user = await User.findOne({ studentId })
+    return FilterUser(user)
+}
+
+const GetUserByEmail = async (email) => {
+    const user = await User.findOne({ email })
+    return FilterUser(user)
+}
+
 const GetUsersByClass = async (classId, isStudent = true) => {
     let users = []
     if (isStudent) {
@@ -47,7 +57,7 @@ const GetUsersByClass = async (classId, isStudent = true) => {
     return users
 }
 
-const CreateUser = async ({ username, password, email, name, contact, studentId, avatar }) => {
+const CreateUser = async ({ username, password, email, name, contact, studentId, avatar, isActive = false }) => {
     let data = {}
     username && (data.username = username)
     email && (data.email = email)
@@ -55,7 +65,8 @@ const CreateUser = async ({ username, password, email, name, contact, studentId,
     contact && (data.contact = contact)
     studentId && (data.studentId = studentId)
     avatar && (data.avatar = avatar)
-
+    data.isActive = isActive
+    
     if (password) {
         const saltRounds = 10
         const hashPassword = bcrypt.hashSync(password, saltRounds)
@@ -92,6 +103,9 @@ const Login = async (username, password) => {
         if (!comparePass) {
             throw "Wrong password"
         }
+        if (!user.isActive) {
+            throw "Account not active yet"
+        }
         return user
     } else {
         const idToken = password
@@ -100,6 +114,9 @@ const Login = async (username, password) => {
         if (fbUser) {
             let user = await User.findOne({ email: fbUser.email })
             if (user) {
+                if (!user.isActive) {
+                    throw "Account not active yet"
+                }
                 return user
             }
             const data = {}
@@ -107,6 +124,7 @@ const Login = async (username, password) => {
             data.name = fbUser.displayName
             fbUser.phoneNumber ? (data.contact = fbUser.phoneNumber) : null
             fbUser.photoURL ? (data.avatar = fbUser.photoURL) : null
+            data.isActive = true
             user = await CreateUser(data)
             return user
         }
@@ -116,6 +134,8 @@ const Login = async (username, password) => {
 
 module.exports = {
     GetUser,
+    GetUserByStudentId,
+    GetUserByEmail,
     GetUsersByClass,
     CreateUser,
     UpdateUser,

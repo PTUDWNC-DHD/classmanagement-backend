@@ -20,6 +20,7 @@ const UserSchema = new mongoose.Schema({
         type: String,
         unique: true,
         sparse: true,
+        required: true,
         validate: {
             validator: function (value) {
                 const re =
@@ -43,14 +44,31 @@ const UserSchema = new mongoose.Schema({
     },
     avatar: {
         type: String,
+    },
+    notifications: [
+        {
+            createAt: {
+                type: mongoose.SchemaTypes.Date,
+                default: new Date()
+            },
+            message: {
+                type: String,
+                required: true,
+            },
+            isNew: {
+                type: Boolean,
+                default: true,
+            }
+        }
+    ],
+    isActive: {
+        type: Boolean,
+        default: false,
     }
 })
 
 UserSchema.pre('save', function (next) {
-    if (!this.username && !this.email) {
-        throw 'User must has username or email'
-    }
-    else if (this.username && !this.password) {
+    if (this.username && !this.password) {
         throw 'Must has password'
     }
     next()
