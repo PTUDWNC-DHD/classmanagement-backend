@@ -32,18 +32,6 @@ router.post("/login", function (req, res, next) {
         }
     )(req, res, next)
 })
-// router.post(
-//     "/login",
-//     passport.authenticate("local", { session: false }),
-//     function (req, res) {
-//         return res.json({
-//             user: req.user,
-//             token: jwt.sign(req.user.toJSON(), process.env.JWT_SECRET, {
-//                 expiresIn: "1h",
-//             }),
-//         })
-//     }
-// )
 
 router.post("/requestactive", async function (req, res) {
     try {
