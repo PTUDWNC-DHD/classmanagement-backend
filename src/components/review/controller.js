@@ -28,6 +28,7 @@ const createReview = async (userId, classId, structureId, studentId, currentGrad
         messages: [{
             userId,
             message: initialMsg,
+            createAt: new Date(),
         }]
     })
     return newReview
@@ -38,7 +39,7 @@ const addMessageReview = async (structureId, studentId, userId, message) => {
     if (!review) {
         throw "Review not exist"
     }
-    review.messages.push({ userId, message })
+    review.messages.push({ userId, message, createAt: new Date() })
     review.save()
 } 
 
@@ -47,7 +48,7 @@ const updateGradeReview = async (structureId, studentId, newGrade) => {
     if (!review) {
         throw "Review not exist"
     }
-    await AddGrade({ studentId, classId: review.classId, gradeId: structureId, score: newGrade })
+    await AddGrade({ studentId, classId: review.classId, gradeId: structureId, score: newGrade, specialSituation: true })
     return await Review.findOneAndUpdate({ structureId, studentId }, { updatedGrade: newGrade }, { new: true })
 }
 

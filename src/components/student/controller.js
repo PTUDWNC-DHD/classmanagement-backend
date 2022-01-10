@@ -30,7 +30,7 @@ const DeleteStudent = async ({ classId, studentId }) => {
     return true
 }
 
-const AddGrade = async ({ studentId, classId, gradeId, score }) => {
+const AddGrade = async ({ studentId, classId, gradeId, score, specialSituation = false }) => {
     const student = await GetStudent({studentId, classId})
     if (!student) {
         throw "Student not exist"
@@ -41,7 +41,7 @@ const AddGrade = async ({ studentId, classId, gradeId, score }) => {
     }
     if (classroom.gradeStructure && classroom.gradeStructure.length != 0) {
         classroom.gradeStructure.forEach(grade => {
-            if (grade._id == gradeId && grade.isFinalized == true) {
+            if (grade._id == gradeId && grade.isFinalized == true && !specialSituation) {
                 throw "This grade has been finalized"
             }
         })

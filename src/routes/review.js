@@ -1,11 +1,13 @@
 const express = require("express")
-const passport = require("passport")
+const passport = require("../middleware/passport")
 const {
     getReview,
     createReview,
     addMessageReview,
     updateGradeReview,
     deleteReview,
+    getReviewsByGradeStructure,
+    getReviewsByClass,
 } = require("../components/review/controller")
 const { GetTeacher } = require("../components/teacher/controller")
 
@@ -17,14 +19,14 @@ router.get(
     async (req, res) => {
         const user = req.user
         const { classId, structureId, studentId } = req.params
-        if (user.studentId != studentId) {
-            const teacher = await GetTeacher(classId, user._id)
-            if (!teacher) {
-                throw "Not in role"
-            }
-        }
-
         try {
+            if (user.studentId != studentId) {
+                const teacher = await GetTeacher({classId, userId: user._id})
+                if (!teacher) {
+                    throw "Not in role"
+                }
+            }
+    
             const review = await getReview(structureId, studentId)
             if (!review) {
                 throw "Review not exist"
@@ -41,19 +43,25 @@ router.get(
     passport.authenticate("jwt", { session: false }),
     async (req, res) => {
         const user = req.user
-        const { classId, structureId, studentId } = req.params
-        const teacher = await GetTeacher(classId, user._id)
-        if (!teacher) {
-            throw "Not in role"
-        }
-
+        const { classId, structureId } = req.params
         try {
-            const review = await getReview(structureId, studentId)
+            console.log(true);
+            const teacher = await GetTeacher({classId, userId: user._id})
+            console.log(true);
+            if (!teacher) {
+                throw "Not in role"
+            }
+            console.log(true);
+            const review = await getReviewsByGradeStructure(structureId)
+            console.log(true);
             if (!review) {
                 throw "Review not exist"
             }
+            console.log(true);
             return res.json(review)
         } catch (error) {
+            console.log(error);
+
             return res.status(400).json({ error })
         }
     }
@@ -64,14 +72,14 @@ router.get(
     passport.authenticate("jwt", { session: false }),
     async (req, res) => {
         const user = req.user
-        const { classId, structureId, studentId } = req.params
-        const teacher = await GetTeacher(classId, user._id)
-        if (!teacher) {
-            throw "Not in role"
-        }
-
+        const { classId } = req.params
         try {
-            const review = await getReview(structureId, studentId)
+            const teacher = await GetTeacher({classId, userId: user._id})
+            if (!teacher) {
+                throw "Not in role"
+            }
+    
+            const review = await getReviewsByClass(classId)
             if (!review) {
                 throw "Review not exist"
             }
@@ -88,15 +96,15 @@ router.post(
     async (req, res) => {
         const user = req.user
         const { classId, structureId, studentId } = req.params
-        if (user.studentId != studentId) {
-            const teacher = await GetTeacher(classId, user._id)
-            if (!teacher) {
-                throw "Not in role"
-            }
-        }
-
         const { currentGrade, expectedGrade, message } = req.body
         try {
+            if (user.studentId != studentId) {
+                const teacher = await GetTeacher({classId, userId: user._id})
+                if (!teacher) {
+                    throw "Not in role"
+                }
+            }
+    
             const review = await createReview(
                 user._id,
                 classId,
@@ -119,15 +127,16 @@ router.patch(
     async (req, res) => {
         const user = req.user
         const { classId, structureId, studentId } = req.params
-        if (user.studentId != studentId) {
-            const teacher = await GetTeacher(classId, user._id)
-            if (!teacher) {
-                throw "Not in role"
-            }
-        }
-
         const { message } = req.body
+        console.log(user.studentId, studentId, message);
         try {
+            if (user.studentId != studentId) {
+                const teacher = await GetTeacher({classId, userId: user._id})
+                if (!teacher) {
+                    throw "Not in role"
+                }
+            }
+    
             await addMessageReview(structureId, studentId, user._id, message)
             return res.send(true)
         } catch (error) {
@@ -142,13 +151,13 @@ router.patch(
     async (req, res) => {
         const user = req.user
         const { classId, structureId, studentId } = req.params
-        const teacher = await GetTeacher(classId, user._id)
-        if (!teacher) {
-            throw "Not in role"
-        }
-
         const { grade } = req.body
         try {
+            const teacher = await GetTeacher({classId, userId: user._id})
+            if (!teacher) {
+                throw "Not in role"
+            }
+    
             await updateGradeReview(structureId, studentId, grade)
             return res.send(true)
         } catch (error) {
@@ -163,14 +172,14 @@ router.delete(
     async (req, res) => {
         const user = req.user
         const { classId, structureId, studentId } = req.params
+        try {
         if (user.studentId != studentId) {
-            const teacher = await GetTeacher(classId, user._id)
+            const teacher = await GetTeacher({classId, userId: user._id})
             if (!teacher) {
                 throw "Not in role"
             }
         }
 
-        try {
             await deleteReview(structureId, studentId)
             return res.send(true)
         } catch (error) {
