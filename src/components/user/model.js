@@ -64,7 +64,11 @@ const UserSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: false,
-    }
+    },
+    isLock: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 UserSchema.pre('save', function (next) {

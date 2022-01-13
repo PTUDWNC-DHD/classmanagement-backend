@@ -106,6 +106,9 @@ const Login = async (username, password) => {
         if (!user.isActive) {
             throw "Account not active yet"
         }
+        if (!user.isActive) {
+            throw "Account has been lock by admin"
+        }
         return user
     } else {
         const idToken = password
