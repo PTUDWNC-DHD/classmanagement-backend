@@ -1,5 +1,5 @@
 const crypto = require("crypto")
-const { GetUser } = require("../user/controller")
+const { GetUser, GetUserByStudentId, AddNotificationByStudentId } = require("../user/controller")
 const { GetStudent, GetStudentsByStudentId, GetStudentsByClass } = require("../student/controller")
 const { GetTeachersByUser, CreateTeacher } = require("../teacher/controller")
 const Class = require("./model")
@@ -108,6 +108,21 @@ const GetGrades = async (classId) => {
     return grades
 }
 
+const NotifyFinalizeGrade = async (classId, structureId, userId) => {
+    const gradeStructure = await GetGradeStructure(classId)
+    gradeStructure.forEach(async e => {
+        if (e._id == structureId && !e.isFinalized) {
+            const user = await GetUser(userId)
+            const classroom = await GetClass(classId)
+            const students = await GetStudentsByClass(classId)
+            const processes = students.map(async student => {
+            await AddNotificationByStudentId(student.studentId, `${user.name} has finalized a grade in ${classroom.name}`)
+            })
+            await Promise.all(processes)
+        }
+    })
+}
+
 module.exports = {
     GetClass,
     GetClassByInviteCode,
@@ -117,4 +132,5 @@ module.exports = {
     IsOwner,
     GetGradeStructure,
     GetGrades,
+    NotifyFinalizeGrade,
 }

@@ -1,4 +1,7 @@
-const { AddGrade } = require("../student/controller")
+const { GetClass } = require("../class/controller")
+const { AddGrade, GetStudent } = require("../student/controller")
+const { GetTeachersByClass } = require("../teacher/controller")
+const { AddNotification, GetUserByStudentId, GetUser, AddNotificationByStudentId } = require("../user/controller")
 const Review = require("./model")
 
 const getReview = async (structureId, studentId) => {
@@ -31,6 +34,14 @@ const createReview = async (userId, classId, structureId, studentId, currentGrad
             createAt: new Date(),
         }]
     })
+
+    const classroom = await GetClass(classId)
+    const teachers = await GetTeachersByClass(classId)
+    const student = await GetStudent({classId, studentId})
+    const processes = await teachers.map(async teacher => {
+        return await AddNotification(teacher.userId, `${student.name} in class ${classroom.name} has requested a grade review`)
+    })
+    await Promise.all(processes)
     return newReview
 }
 
@@ -41,6 +52,13 @@ const addMessageReview = async (structureId, studentId, userId, message) => {
     }
     review.messages.push({ userId, message, createAt: new Date() })
     review.save()
+
+    const classroom = await GetClass(review.classId)
+    const student = await GetUserByStudentId(studentId)
+    if (student._id != userId) {
+        const teacher = await GetUser(userId)
+        await AddNotification(student._id, `Teacher ${teacher.name} in class ${classroom.name} replies to your `)
+    }
 } 
 
 const updateGradeReview = async (structureId, studentId, newGrade) => {
@@ -49,7 +67,12 @@ const updateGradeReview = async (structureId, studentId, newGrade) => {
         throw "Review not exist"
     }
     await AddGrade({ studentId, classId: review.classId, gradeId: structureId, score: newGrade, specialSituation: true })
-    return await Review.findOneAndUpdate({ structureId, studentId }, { updatedGrade: newGrade }, { new: true })
+    const updatedReview = await Review.findOneAndUpdate({ structureId, studentId }, { updatedGrade: newGrade }, { new: true })
+
+    const classroom = await GetClass(review.classId)
+    await AddNotificationByStudentId(studentId, `Your grade in class ${classroom.name} is updated upon your request grade review`)
+
+    return updatedReview
 }
 
 const deleteReview = async (structureId, studentId) => {
