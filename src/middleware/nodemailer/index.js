@@ -90,7 +90,7 @@ async function SendResetPassCodeMail(toEmail, code) {
     await transporter.sendMail({
         from: '"DHD Class Management APP 👻" <dhd.classmanagerment@gmail.com>', // sender address
         to: toEmail, // list of receivers
-        subject: "Seset Password", // Subject line
+        subject: "Reset Password", // Subject line
         text: `Your code: ${code}
         Please do not send this code for anyone.`, // plain text body
         html: `Your code:<br><strong>${code}</strong><br>
