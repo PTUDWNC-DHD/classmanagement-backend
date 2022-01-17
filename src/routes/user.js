@@ -10,6 +10,7 @@ const passport = require("../middleware/passport")
 const { CreateCode } = require("../components/code/controller")
 const typeCodeEnum = require("../components/code/type-code-enum")
 const { SendActiveCodeMail } = require("../middleware/nodemailer")
+const jwt = require("jsonwebtoken")
 
 const router = new express.Router()
 
@@ -79,7 +80,12 @@ router.patch(
         const data = req.body
         try {
             const newuser = await UpdateUser(user._id, data)
-            return res.json(newuser)
+            return res.json({
+                user: newuser,
+                token: jwt.sign(user.toJSON(), process.env.JWT_SECRET, {
+                    expiresIn: "1h",
+                }),
+            })
         } catch (error) {
             res.json({
                 errors: [error.toString()],
