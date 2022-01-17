@@ -62,6 +62,15 @@ router.get(
     }
 )
 
+router.get(
+    "/me/notifications",
+    passport.authenticate("jwt", { session: false }),
+    async (req, res) => {
+        const user = await GetUser(req.user._id)
+        return res.json(user.notification)
+    }
+)
+
 router.patch(
     "/me",
     passport.authenticate("jwt", { session: false }),

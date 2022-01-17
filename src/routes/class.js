@@ -8,6 +8,8 @@ const {
     UpdateClass,
     IsOwner,
     GetGrades,
+    GetGradeStructure,
+    NotifyFinalizeGrade,
 } = require("../components/class/controller")
 const Class = require("../components/class/model")
 const { AddGrade, CreateStudent } = require("../components/student/controller")
@@ -78,6 +80,15 @@ router.patch(
             }
 
             const { name, isEnded, invite, gradeStructure } = req.body
+            if (gradeStructure) {
+                const processes = await gradeStructure.map(async e => {
+                    if (e.isFinalized == true) {
+                        return await NotifyFinalizeGrade(id, e._id, user._id)
+                    }
+                    return
+                });
+                await Promise.all(processes)
+            }
             const classroom = await UpdateClass(id, { name, isEnded, invite, gradeStructure })
             return res.json(classroom)
         } catch (error) {

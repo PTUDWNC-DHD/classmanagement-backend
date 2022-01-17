@@ -78,7 +78,6 @@ async function SendActiveCodeMail(toEmail, activecode) {
     })
 }
 
-
 async function SendResetPassCodeMail(toEmail, code) {
     let transporter = nodemailer.createTransport({
         service: "Gmail",
