@@ -135,6 +135,24 @@ const Login = async (username, password) => {
     }
 }
 
+const AddNotification = async (userid, message) => {
+    const user = await User.findById(userid)
+    if (!user) {
+        throw "user not exist"
+    }
+    user.notifications.push({ message })
+    user.save();
+}
+
+const AddNotificationByStudentId = async (studentId, message) => {
+    const user = await User.findOne({ studentId })
+    if (!user) {
+        throw "user not exist"
+    }
+    user.notifications.push({ message })
+    user.save();
+}
+
 module.exports = {
     GetUser,
     GetUserByStudentId,
@@ -143,4 +161,6 @@ module.exports = {
     CreateUser,
     UpdateUser,
     Login,
+    AddNotification,
+    AddNotificationByStudentId,
 }
