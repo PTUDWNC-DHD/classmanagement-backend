@@ -50,6 +50,8 @@ const ClassSchema = new mongoose.Schema({
             }
         }
     ]
+}, {
+    timestamps: true
 })
 
 const Class = mongoose.model("classes", ClassSchema)
