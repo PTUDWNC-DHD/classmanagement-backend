@@ -82,7 +82,7 @@ router.patch(
             const newuser = await UpdateUser(user._id, data)
             return res.json({
                 user: newuser,
-                token: jwt.sign(user.toJSON(), process.env.JWT_SECRET, {
+                token: jwt.sign(newuser.toJSON(), process.env.JWT_SECRET, {
                     expiresIn: "1h",
                 }),
             })
