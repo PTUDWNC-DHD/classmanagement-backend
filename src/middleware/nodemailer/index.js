@@ -78,25 +78,6 @@ async function SendActiveCodeMail(toEmail, activecode) {
     })
 }
 
-async function SendActiveCodeMail(toEmail, code) {
-    let transporter = nodemailer.createTransport({
-        service: "Gmail",
-        auth: {
-            user: process.env.SENDMAIL_USERNAME, // generated ethereal user
-            pass: process.env.SENDMAIL_PASSWORD, // generated ethereal password
-        },
-    })
-
-    await transporter.sendMail({
-        from: '"DHD Class Management APP 👻" <dhd.classmanagerment@gmail.com>', // sender address
-        to: toEmail, // list of receivers
-        subject: "Active code", // Subject line
-        text: `Your active account code: ${code}
-        Please do not send this code for anyone.`, // plain text body
-        html: `Your active account code:<br><strong>${code}</strong><br>
-        Please do not send this code for anyone.`, // html body
-    })
-}
 
 async function SendResetPassCodeMail(toEmail, code) {
     let transporter = nodemailer.createTransport({
@@ -110,7 +91,7 @@ async function SendResetPassCodeMail(toEmail, code) {
     await transporter.sendMail({
         from: '"DHD Class Management APP 👻" <dhd.classmanagerment@gmail.com>', // sender address
         to: toEmail, // list of receivers
-        subject: "Seset Password", // Subject line
+        subject: "Reset Password", // Subject line
         text: `Your code: ${code}
         Please do not send this code for anyone.`, // plain text body
         html: `Your code:<br><strong>${code}</strong><br>
