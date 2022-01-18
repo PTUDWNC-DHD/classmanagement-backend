@@ -1,5 +1,4 @@
 const express = require("express")
-const cors = require("cors")
 const { GetClassByInviteCode, IsOwner } = require("../components/class/controller")
 const { SendInviteMail } = require("../middleware/nodemailer")
 const passport = require("../middleware/passport")
@@ -8,7 +7,7 @@ const router = new express.Router()
 
 router.post(
     "/invite",
-    passport.authenticate("jwt", { session: false }), cors(),
+    passport.authenticate("jwt", { session: false }),
     async (req, res) => {
         const { user } = req
         const { to, classId, isPublic, isStudent } = req.body
