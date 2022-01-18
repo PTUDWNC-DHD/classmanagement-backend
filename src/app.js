@@ -18,15 +18,15 @@ const useRoute = require('./routes')
 // start app express
 const app = express();
 
+// enabling CORS for all requests
+app.use(cors())
+
 // adding Helmet to enhance API's security
 app.use(helmet());
 
 // parse the incoming requests with JSON payloads
 app.use(urlencoded({extended: true}))
 app.use(json()) 
-
-// enabling CORS for all requests
-app.use(cors())
 
 // adding morgan to log HTTP requests
 app.use(morgan('combined'))
