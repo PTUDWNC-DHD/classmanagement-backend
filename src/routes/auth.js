@@ -1,4 +1,5 @@
 const express = require("express")
+const cors = require("cors")
 const passport = require("../middleware/passport")
 const jwt = require("jsonwebtoken")
 const { CreateCode, CheckCode } = require("../components/code/controller")
@@ -33,7 +34,7 @@ router.post("/login", function (req, res, next) {
     )(req, res, next)
 })
 
-router.post("/requestactive", async function (req, res) {
+router.post("/requestactive", cors(), async function (req, res) {
     try {
         const { email } = req.body
         const code = await CreateCode(email, typeCodeEnum.ACTIVE_ACCOUNT)
@@ -49,7 +50,7 @@ router.post("/requestactive", async function (req, res) {
     }
 })
 
-router.post("/forgotpassword", async function (req, res) {
+router.post("/forgotpassword", cors(), async function (req, res) {
     try {
         const { email } = req.body
         const code = await CreateCode(email, typeCodeEnum.RESET_PASSWORD)
@@ -65,7 +66,7 @@ router.post("/forgotpassword", async function (req, res) {
     }
 })
 
-router.post("/active", async function (req, res) {
+router.post("/active", cors(), async function (req, res) {
     try {
         const { email, code } = req.body
         const checked = await CheckCode(
@@ -87,7 +88,7 @@ router.post("/active", async function (req, res) {
     }
 })
 
-router.post("/checkresetpasswordcode", async function (req, res) {
+router.post("/checkresetpasswordcode", cors(), async function (req, res) {
     try {
         const { email, code } = req.body
         const checked = await CheckCode(
@@ -122,7 +123,7 @@ router.post("/checkresetpasswordcode", async function (req, res) {
     }
 })
 
-router.post("/resetpassword", async function (req, res) {
+router.post("/resetpassword", cors(), async function (req, res) {
     try {
         const { token, password } = req.body
         console.log(token, password);
