@@ -106,7 +106,7 @@ const Login = async (username, password) => {
         if (!user.isActive) {
             throw "Account not active yet"
         }
-        if (!user.isActive) {
+        if (user.isLock) {
             throw "Account has been lock by admin"
         }
         return user
@@ -117,6 +117,9 @@ const Login = async (username, password) => {
         if (fbUser) {
             let user = await User.findOne({ email: fbUser.email })
             if (user) {
+                if (user.isLock) {
+                    throw "Account has been lock by admin"
+                }
                 if (!user.isActive) {
                     throw "Account not active yet"
                 }
