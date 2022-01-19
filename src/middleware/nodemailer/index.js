@@ -21,7 +21,7 @@ async function SendInviteMail(fromUser, toEmail, classId, isPublic, isStudent) {
 
         // send mail with defined transport object
         await transporter.sendMail({
-            from: '"DHD Class Management APP 👻" <dhd.classmanagerment@gmail.com>', // sender address
+            from: `"DHD Class Management APP" <${process.env.SENDMAIL_USERNAME}>`, // sender address
             to: toEmail.join(' '), // list of receivers
             subject: "An invitation to new class", // Subject line
             text: `Hello, ${fromUser.name}<${fromUser.email}> has invited you to join his class
@@ -42,7 +42,7 @@ async function SendInviteMail(fromUser, toEmail, classId, isPublic, isStudent) {
 
             // send mail with defined transport object
             await transporter.sendMail({
-                from: '"DHD Class Management APP 👻" <dhd.classmanagerment@gmail.com>', // sender address
+                from: `"DHD Class Management APP" <${process.env.SENDMAIL_USERNAME}>`, // sender address
                 to: email, // list of receivers
                 subject: "An invitation to new class", // Subject line
                 text: `Hello, ${fromUser.name}<${fromUser.email}> has invited you to join his class
